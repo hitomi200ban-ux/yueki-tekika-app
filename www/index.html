@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分かりやすい輸液滴下計算アプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 入力画面 -->
+        <div id="inputScreen" class="screen active">
+            <h1>💧 輸液滴下計算</h1>
+
+            <div class="form-group">
+                <label>輸液量（左右にスワイプして選択）</label>
+                <div class="volume-swiper-wrapper">
+                    <button class="swiper-arrow left" id="prevBtn">&#8249;</button>
+                    <div class="volume-swiper">
+                        <div class="swiper-track" id="swiperTrack">
+                            <div class="swiper-item" data-volume="500"><img src="./img/500ml.PNG" alt="500ml"></div>
+                            <div class="swiper-item" data-volume="200"><img src="./img/200ml.PNG" alt="200ml"></div>
+                            <div class="swiper-item" data-volume="100"><img src="./img/100ml.PNG" alt="100ml"></div>
+                            <div class="swiper-item" data-volume="50"><img src="./img/50ml.PNG" alt="50ml"></div>
+                            <div class="swiper-item" data-volume="manual">
+                                <div class="manual-input-box">
+                                    <p class="manual-label">手動で入力</p>
+                                    <input type="number" id="manualVolume" placeholder="例：250" min="1" step="1">
+                                    <button id="manualConfirmBtn" class="manual-confirm-btn">決定</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="swiper-arrow right" id="nextBtn">&#8250;</button>
+                </div>
+                <p class="selected-volume-label">選択中：<span id="selectedVolumeText">500 mL</span></p>
+            </div>
+
+            <div class="form-group">
+                <label>輸液ルートの種類</label>
+                <div class="button-group">
+                    <button id="adultBtn" class="type-btn active" data-type="adult">
+                        <img src="./img/seizinyou.PNG" alt="成人用">
+                        <span>成人用（20滴/mL）</span>
+                    </button>
+                    <button id="childBtn" class="type-btn" data-type="child">
+                        <img src="./img/sixyouniyou.PNG" alt="小児用">
+                        <span>小児用（60滴/mL）</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>投与時間</label>
+                <div class="time-select-wrapper">
+                    <select id="hourSelect" class="time-select">
+                        <option value="0">0</option><option value="1" selected>1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                        <option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                        <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+                        <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                        <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                        <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                        <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                        <option value="24">24</option>
+                    </select>
+                    <span class="time-label">時間</span>
+                    <select id="minuteSelect" class="time-select">
+                        <option value="0" selected>00</option>
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="45">45</option>
+                    </select>
+                    <span class="time-label">分</span>
+                </div>
+            </div>
+
+            <div class="confirm-summary" id="confirmSummary">
+                <span id="summaryVolume">-- mL</span> × <span id="summaryDrop">20滴/mL</span>
+                <div class="summary-divider">─────────────</div>
+                <span id="summaryTime">--時間--分（--分）</span>
+            </div>
+
+            <button id="calculateBtn" class="calculate-btn">計算する</button>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="resultScreen" class="screen">
+            <h1>💧 滴下速度</h1>
+
+            <div class="result-box">
+                <div class="result-item">
+                    <span class="result-label">滴下数</span>
+                    <span class="result-value" id="dropRate">-- 滴/分</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">滴下間隔</span>
+                    <span class="result-value" id="dropInterval">-- 秒</span>
+                </div>
+            </div>
+
+            <div class="animation-container">
+                <div id="dropZone" class="drop-zone">
+                    <div class="iv-chamber-container">
+                        <img src="./img/in_chamber.png" alt="輸液チャンバー" class="iv-chamber-img" id="ivChamberImg">
+                        <div id="dropArea"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="backBtn" class="back-btn">戻る</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
