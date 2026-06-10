@@ -405,11 +405,195 @@ h1 {
 }
 
 /* 結果表示 */
+.result-section-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #90a4ae;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+/* 1枚カード */
+.result-card {
+    background: #ffffff;
+    border: 2px solid #0288d1;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.result-card-top {
+    padding: 18px 20px 16px;
+}
+
+.result-card-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.result-card-block {
+    flex: 1;
+    text-align: center;
+}
+
+.result-card-divider-v {
+    width: 1px;
+    height: 56px;
+    background: #b3e5fc;
+    margin: 0 8px;
+}
+
+.result-rate-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.result-rate-value {
+    font-size: 44px;
+    font-weight: bold;
+    color: #0277bd;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.result-rate-unit {
+    font-size: 15px;
+    color: #0288d1;
+    font-weight: bold;
+}
+
+.result-guide-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+}
+
+.result-guide-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #f57f17;
+    line-height: 1;
+}
+
+.result-guide-unit {
+    font-size: 15px;
+    font-weight: bold;
+    color: #f57f17;
+}
+
+/* 計算式アコーディオン */
+.formula-toggle {
+    width: 100%;
+    padding: 10px 20px;
+    background: #f0f9ff;
+    border: none;
+    border-top: 1px solid #b3e5fc;
+    color: #0288d1;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.formula-toggle-arrow {
+    font-size: 11px;
+    transition: transform 0.25s ease;
+    display: inline-block;
+}
+
+.formula-toggle[aria-expanded="true"] .formula-toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.formula-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.formula-body.open {
+    max-height: 300px;
+}
+
+.formula-inner {
+    padding: 14px 20px 16px;
+    border-top: 1px solid #e3f2fd;
+}
+
+.formula-line {
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    line-height: 1.8;
+}
+
+.formula-val {
+    font-weight: bold;
+    color: #0288d1;
+    font-size: 17px;
+}
+
+.formula-unit {
+    color: #555;
+    font-size: 13px;
+}
+
+.formula-op {
+    color: #333;
+    font-size: 16px;
+}
+
+.formula-divider {
+    border-top: 2px solid #000;
+    margin: 4px 10%;
+}
+
+.formula-time {
+    color: #555;
+}
+
+.formula-paren {
+    color: #888;
+    font-size: 13px;
+}
+
+.formula-result-line {
+    text-align: center;
+    line-height: 1.9;
+}
+
+.formula-eq {
+    color: #555;
+    font-size: 15px;
+}
+
+.formula-exact {
+    font-size: 17px;
+    font-weight: bold;
+    color: #555;
+}
+
+.formula-approx {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0277bd;
+}
+
+/* 旧スタイル（互換） */
 .result-box {
     background: linear-gradient(135deg, #e1f5fe 0%, #ffffff 100%);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 30px;
+    display: none;
 }
 
 .result-item {

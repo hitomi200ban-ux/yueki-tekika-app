@@ -91,16 +91,57 @@
         <div id="resultScreen" class="screen">
             <h1>💧 滴下速度</h1>
 
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">滴下数</span>
-                    <span class="result-value" id="dropRate">-- 滴/分</span>
+            <!-- 結果カード（速度・合わせ方・計算式アコーディオン） -->
+            <div class="result-card">
+                <!-- 滴下速度 -->
+                <div class="result-card-top">
+                    <div class="result-card-row">
+                        <div class="result-card-block">
+                            <div class="result-section-label">滴下速度</div>
+                            <div class="result-rate-row">
+                                <span class="result-rate-value" id="dropRate">--</span>
+                                <span class="result-rate-unit">滴/分</span>
+                            </div>
+                        </div>
+                        <div class="result-card-divider-v"></div>
+                        <div class="result-card-block">
+                            <div class="result-section-label">合わせ方</div>
+                            <div class="result-guide-row">
+                                <span class="result-guide-value" id="dropIntervalSec">--</span>
+                                <span class="result-guide-unit">秒に1滴</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="result-item">
-                    <span class="result-label">滴下間隔</span>
-                    <span class="result-value" id="dropInterval">-- 秒</span>
+                <!-- 計算式アコーディオン -->
+                <button class="formula-toggle" id="formulaToggle" aria-expanded="false">
+                    計算式を見る <span class="formula-toggle-arrow">▼</span>
+                </button>
+                <div class="formula-body" id="formulaBody">
+                    <div class="formula-inner">
+                        <div class="formula-line">
+                            <span class="formula-val" id="fVolume">--</span><span class="formula-unit">mL</span>
+                            <span class="formula-op"> × </span>
+                            <span class="formula-val" id="fDrop">--</span><span class="formula-unit">滴/mL</span>
+                        </div>
+                        <div class="formula-divider"></div>
+                        <div class="formula-line formula-time">
+                            <span class="formula-val" id="fHour">--</span><span class="formula-unit">時間</span>
+                            <span class="formula-val" id="fMin">--</span><span class="formula-unit">分</span>
+                            <span class="formula-paren">（<span id="fTotalMin">--</span>分）</span>
+                        </div>
+                        <div class="formula-result-line">
+                            <span class="formula-eq">= </span><span class="formula-exact" id="fExact">--</span><span class="formula-unit"> 滴/分</span>
+                        </div>
+                        <div class="formula-result-line">
+                            <span class="formula-eq">≈ </span><span class="formula-approx" id="fApprox">--</span><span class="formula-unit"> 滴/分</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- 旧IDを維持（アニメーション用） -->
+            <span id="dropInterval" style="display:none;"></span>
 
             <div class="sound-toggle-wrap">
                 <button id="soundBtn" class="sound-btn" data-on="false">

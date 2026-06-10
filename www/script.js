@@ -155,8 +155,19 @@ calculateBtn.addEventListener('click', () => {
     const dropRate = (volume * dropFactor) / (hours * 60);
     const dropInterval = 60 / dropRate;
 
-    dropRateDisplay.textContent = dropRate.toFixed(1) + ' 滴/分';
-    dropIntervalDisplay.textContent = dropInterval.toFixed(2) + ' 秒';
+    const dropRateRounded = Math.round(dropRate * 10) / 10;
+    const secPerDrop = Math.round(60 / dropRate);
+
+    dropRateDisplay.textContent = dropRateRounded;
+    document.getElementById('dropIntervalSec').textContent = secPerDrop;
+    document.getElementById('fVolume').textContent   = volume;
+    document.getElementById('fDrop').textContent     = dropFactor;
+    document.getElementById('fHour').textContent     = parseInt(hourSelect.value);
+    document.getElementById('fMin').textContent      = String(parseInt(minuteSelect.value)).padStart(2, '0');
+    document.getElementById('fTotalMin').textContent = Math.round(hours * 60);
+    document.getElementById('fExact').textContent    = dropRate.toFixed(1);
+    document.getElementById('fApprox').textContent   = Math.round(dropRate);
+    dropIntervalDisplay.textContent = dropInterval.toFixed(2);
 
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
@@ -176,12 +187,37 @@ calculateBtn.addEventListener('click', () => {
 });
 
 // ============================================================
+// 計算式アコーディオン
+// ============================================================
+document.getElementById('formulaToggle').addEventListener('click', () => {
+    const btn  = document.getElementById('formulaToggle');
+    const body = document.getElementById('formulaBody');
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.querySelector('.formula-toggle-arrow').style.transform = open ? '' : 'rotate(180deg)';
+    body.classList.toggle('open', !open);
+    btn.textContent = '';
+    const arrow = document.createElement('span');
+    arrow.className = 'formula-toggle-arrow';
+    arrow.style.transform = open ? '' : 'rotate(180deg)';
+    arrow.textContent = '▼';
+    btn.appendChild(document.createTextNode(open ? '計算式を見る ' : '計算式を閉じる '));
+    btn.appendChild(arrow);
+});
+
+// ============================================================
 // 戻るボタン
 // ============================================================
 backBtn.addEventListener('click', () => {
     stopDropAnimation();
     stopChildDropAnimation();
     stopTickSound();
+    // アコーディオンをリセット
+    const btn  = document.getElementById('formulaToggle');
+    const body = document.getElementById('formulaBody');
+    btn.setAttribute('aria-expanded', 'false');
+    body.classList.remove('open');
+    btn.innerHTML = '計算式を見る <span class="formula-toggle-arrow">▼</span>';
     resultScreen.classList.remove('active');
     inputScreen.classList.add('active');
 });
