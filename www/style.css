@@ -517,6 +517,10 @@ h1 {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
+    background: #ffffff;
+    border: 2px solid #0288d1;
+    border-radius: 16px;
+    margin-bottom: 6px;
 }
 
 .formula-body.open {
@@ -525,7 +529,6 @@ h1 {
 
 .formula-inner {
     padding: 14px 20px 16px;
-    border-top: 1px solid #e3f2fd;
 }
 
 .formula-line {
@@ -652,12 +655,178 @@ h1 {
     font-size: 16px;
 }
 
+/* 結果画面レイアウト */
+.result-screen-layout {
+    padding: 12px 8px 8px !important;
+    margin: 0 !important;
+}
+
+/* 3カラムレイアウト */
+.result-3col {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0;
+}
+
+/* 左：滴下速度 */
+.result-left {
+    flex: 0 0 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+/* 中央：アニメーション（主役） */
+.result-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 右：合わせ方＋ボタン */
+.result-right {
+    flex: 0 0 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
+}
+
+.result-guide-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.rn-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #90a4ae;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.rn-rate-wrap {
+    display: flex;
+    align-items: baseline;
+}
+
+.rn-rate {
+    font-size: 52px;
+    font-weight: bold;
+    color: #0277bd;
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.rn-unit {
+    font-size: 13px;
+    font-weight: bold;
+    color: #0288d1;
+    margin-top: 1px;
+}
+
+.rn-exact {
+    font-size: 10px;
+    color: #90a4ae;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.rn-sec-wrap {
+    display: flex;
+    align-items: baseline;
+}
+
+.rn-sec {
+    font-size: 52px;
+    font-weight: bold;
+    color: #f57f17;
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.rn-sec-unit {
+    font-size: 13px;
+    font-weight: bold;
+    color: #f57f17;
+    margin-top: 1px;
+}
+
+.sound-btn-v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    width: 38px;
+    padding: 6px 2px;
+    border: 1.5px solid #b3e5fc;
+    border-radius: 12px;
+    background: #fff;
+    color: #90a4ae;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sound-btn-v .sound-icon {
+    font-size: 18px;
+}
+
+.sound-btn-v .sound-label-v {
+    font-size: 10px;
+}
+
+.sound-btn-v[data-on="true"] {
+    border-color: #4fc3f7;
+    background: #e1f5fe;
+    color: #0288d1;
+}
+
+.formula-toggle-v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    width: 38px;
+    padding: 6px 2px;
+    border: 1.5px solid #b3e5fc;
+    border-radius: 12px;
+    background: #fff;
+    color: #0288d1;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.formula-toggle-v[aria-expanded="true"] {
+    background: #e1f5fe;
+    border-color: #0288d1;
+}
+
 /* アニメーションコンテナ */
 .animation-container {
-    background: linear-gradient(180deg, #f5f9fc 0%, #e8f4f8 100%);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 24px;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -685,7 +854,7 @@ h1 {
 /* 戻るボタン */
 .back-btn {
     width: 100%;
-    padding: 14px;
+    padding: 10px;
     border: 2px solid #b3e5fc;
     border-radius: 12px;
     background: #fff;

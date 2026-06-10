@@ -155,10 +155,12 @@ calculateBtn.addEventListener('click', () => {
     const dropRate = (volume * dropFactor) / (hours * 60);
     const dropInterval = 60 / dropRate;
 
-    const dropRateRounded = Math.round(dropRate * 10) / 10;
+    const dropRateFloor = Math.floor(dropRate);
+    const dropRateExact = dropRate.toFixed(1);
     const secPerDrop = Math.round(60 / dropRate);
 
-    dropRateDisplay.textContent = dropRateRounded;
+    dropRateDisplay.textContent = dropRateFloor;
+    document.getElementById('dropRateExact').textContent = dropRateExact;
     document.getElementById('dropIntervalSec').textContent = secPerDrop;
     document.getElementById('fVolume').textContent   = volume;
     document.getElementById('fDrop').textContent     = dropFactor;
@@ -171,6 +173,7 @@ calculateBtn.addEventListener('click', () => {
 
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
+    document.body.style.padding = '0';
 
     if (selectedType === 'child') {
         document.getElementById('chamberAdult').style.display = 'none';
@@ -194,15 +197,7 @@ document.getElementById('formulaToggle').addEventListener('click', () => {
     const body = document.getElementById('formulaBody');
     const open = btn.getAttribute('aria-expanded') === 'true';
     btn.setAttribute('aria-expanded', String(!open));
-    btn.querySelector('.formula-toggle-arrow').style.transform = open ? '' : 'rotate(180deg)';
     body.classList.toggle('open', !open);
-    btn.textContent = '';
-    const arrow = document.createElement('span');
-    arrow.className = 'formula-toggle-arrow';
-    arrow.style.transform = open ? '' : 'rotate(180deg)';
-    arrow.textContent = '▼';
-    btn.appendChild(document.createTextNode(open ? '計算式を見る ' : '計算式を閉じる '));
-    btn.appendChild(arrow);
 });
 
 // ============================================================
@@ -213,13 +208,11 @@ backBtn.addEventListener('click', () => {
     stopChildDropAnimation();
     stopTickSound();
     // アコーディオンをリセット
-    const btn  = document.getElementById('formulaToggle');
-    const body = document.getElementById('formulaBody');
-    btn.setAttribute('aria-expanded', 'false');
-    body.classList.remove('open');
-    btn.innerHTML = '計算式を見る <span class="formula-toggle-arrow">▼</span>';
+    document.getElementById('formulaToggle').setAttribute('aria-expanded', 'false');
+    document.getElementById('formulaBody').classList.remove('open');
     resultScreen.classList.remove('active');
     inputScreen.classList.add('active');
+    document.body.style.padding = '20px';
 });
 
 // ============================================================
@@ -263,8 +256,8 @@ function stopTickSound() {
 soundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
     soundBtn.dataset.on = soundOn;
-    soundBtn.querySelector('.sound-icon').textContent  = soundOn ? '🔊' : '🔇';
-    soundBtn.querySelector('.sound-label').textContent = soundOn ? '音ON' : '音OFF';
+    soundBtn.querySelector('.sound-icon').textContent    = soundOn ? '🔊' : '🔇';
+    soundBtn.querySelector('.sound-label-v').textContent = soundOn ? '音ON' : '音OFF';
     if (soundOn) {
         startTickSound(currentTickInterval);
     } else {
