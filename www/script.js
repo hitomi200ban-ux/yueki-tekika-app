@@ -1,7 +1,7 @@
 // ============================================================
 // 状態変数
 // ============================================================
-let selectedType = 'adult';
+let selectedType = null;
 let dropAnimationInterval = null;
 let currentIndex = 0;
 let manualVolume = null;
@@ -45,7 +45,7 @@ function updateSummary() {
     const m = parseInt(minuteSelect.value);
     const totalMin = h * 60 + m;
     document.getElementById('summaryVolume').textContent = vol ? vol : '--';
-    document.getElementById('summaryDrop').textContent = selectedType === 'adult' ? '20' : '60';
+    document.getElementById('summaryDrop').textContent = selectedType === 'adult' ? '20' : selectedType === 'child' ? '60' : '--';
     document.getElementById('summaryHour').textContent = h;
     document.getElementById('summaryMin').textContent = String(m).padStart(2, '0');
     document.getElementById('summaryTotalMin').textContent = totalMin;
@@ -120,7 +120,7 @@ document.getElementById('manualConfirmBtn').addEventListener('click', () => {
     document.getElementById('manualConfirmBtn').classList.add('decided');
 });
 
-updateSwiper(0);
+updateSwiper(1);
 
 // ============================================================
 // ルート種類選択
