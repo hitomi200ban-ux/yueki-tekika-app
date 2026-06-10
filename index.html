@@ -13,7 +13,8 @@
             <h1>💧 輸液滴下計算</h1>
 
             <div class="form-group">
-                <label>輸液量（左右にスワイプ・タップで選択）</label>
+                <label>輸液量</label>
+                <p class="swipe-hint">左右にスワイプ・タップで選択</p>
                 <div class="volume-swiper-wrapper">
                     <button class="swiper-arrow left" id="prevBtn">&#8249;</button>
                     <div class="volume-swiper">
@@ -75,10 +76,11 @@
                 </div>
             </div>
 
+            <p class="summary-title">計算式</p>
             <div class="confirm-summary" id="confirmSummary">
-                <span id="summaryVolume">-- mL</span> × <span id="summaryDrop">20滴/mL</span>
-                <div class="summary-divider">─────────────</div>
-                <span id="summaryTime">--時間--分（--分）</span>
+                <span class="summary-value" id="summaryVolume">--</span><span class="summary-unit"> mL</span> <span class="summary-operator">×</span> <span class="summary-value" id="summaryDrop">20</span><span class="summary-unit">滴/mL</span>
+                <div class="summary-divider"></div>
+                <span class="summary-value" id="summaryHour">--</span><span class="summary-unit">時間</span><span class="summary-value" id="summaryMin">--</span><span class="summary-unit">分（</span><span class="summary-value" id="summaryTotalMin">--</span><span class="summary-unit">分）</span>
             </div>
 
             <button id="calculateBtn" class="calculate-btn">計算する</button>

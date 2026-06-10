@@ -44,10 +44,11 @@ function updateSummary() {
     const h = parseInt(hourSelect.value);
     const m = parseInt(minuteSelect.value);
     const totalMin = h * 60 + m;
-    document.getElementById('summaryVolume').textContent = vol ? (vol + ' mL') : '-- mL';
-    document.getElementById('summaryDrop').textContent = dropLabel;
-    document.getElementById('summaryTime').textContent =
-        h + '時間' + String(m).padStart(2, '0') + '分（' + totalMin + '分）';
+    document.getElementById('summaryVolume').textContent = vol ? vol : '--';
+    document.getElementById('summaryDrop').textContent = selectedType === 'adult' ? '20' : '60';
+    document.getElementById('summaryHour').textContent = h;
+    document.getElementById('summaryMin').textContent = String(m).padStart(2, '0');
+    document.getElementById('summaryTotalMin').textContent = totalMin;
 }
 
 // ============================================================
