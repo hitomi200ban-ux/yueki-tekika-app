@@ -111,6 +111,7 @@ document.getElementById('manualConfirmBtn').addEventListener('click', () => {
     if (!val || val <= 0) { alert('正しい数値を入力してください。'); return; }
     manualVolume = val;
     confirmSelection(4);
+    document.getElementById('manualConfirmBtn').classList.add('decided');
 });
 
 updateSwiper(0);

@@ -161,6 +161,10 @@ h1 {
 }
 
 /* 手動入力ボックス */
+.swiper-item[data-volume="manual"] {
+    background: #ffffff;
+}
+
 .manual-input-box {
     display: flex;
     flex-direction: column;
@@ -179,34 +183,41 @@ h1 {
 .manual-input-box input {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #b3e5fc;
-    border-radius: 12px;
+    border: 1.5px solid #000000;
+    border-radius: 0;
     font-size: 20px;
     text-align: center;
-    background: #fafafa;
+    background: #ffffff;
 }
 
 .manual-input-box input:focus {
     outline: none;
-    border-color: #0288d1;
+    border-color: #000000;
     background: #fff;
 }
 
 .manual-confirm-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #4fc3f7 0%, #0288d1 100%);
-    color: white;
-    font-size: 17px;
+    padding: 8px 28px;
+    border: 1.5px solid #0288d1;
+    border-radius: 20px;
+    background: #fff;
+    color: #0288d1;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s;
+    letter-spacing: 1px;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.manual-confirm-btn.decided {
+    background: #e1f5fe;
+    border-color: #0288d1;
 }
 
 .manual-confirm-btn:active {
-    transform: scale(0.97);
+    background: #e1f5fe;
 }
 
 .selected-volume-label {
@@ -278,9 +289,6 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #fafafa;
-    border: 2px solid #b3e5fc;
-    border-radius: 12px;
     padding: 12px 16px;
 }
 
