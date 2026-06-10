@@ -161,6 +161,7 @@ calculateBtn.addEventListener('click', () => {
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
     startDropAnimation(dropInterval);
+    startTickSound(dropInterval);
 });
 
 // ============================================================
@@ -168,8 +169,59 @@ calculateBtn.addEventListener('click', () => {
 // ============================================================
 backBtn.addEventListener('click', () => {
     stopDropAnimation();
+    stopTickSound();
     resultScreen.classList.remove('active');
     inputScreen.classList.add('active');
+});
+
+// ============================================================
+// 音ON/OFFボタン（メトロノーム音）
+// ============================================================
+const soundBtn = document.getElementById('soundBtn');
+let soundOn = false;
+let audioCtx = null;
+let tickIntervalId = null;
+let currentTickInterval = 1.0;
+
+function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+}
+
+function scheduleTick(ac, when) {
+    const osc  = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, when);
+    osc.frequency.exponentialRampToValueAtTime(600, when + 0.04);
+    gain.gain.setValueAtTime(0.35, when);
+    gain.gain.exponentialRampToValueAtTime(0.001, when + 0.06);
+    osc.start(when);
+    osc.stop(when + 0.06);
+}
+
+function startTickSound(intervalSec) {
+    currentTickInterval = intervalSec;
+    // 音はアニメーションの着水タイミングで鳴らすため、ここではAudioCtxの初期化のみ
+    if (soundOn) getAudioCtx();
+}
+
+function stopTickSound() {
+    // 着水イベント駆動のため特に停止処理不要
+}
+
+soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.dataset.on = soundOn;
+    soundBtn.querySelector('.sound-icon').textContent  = soundOn ? '🔊' : '🔇';
+    soundBtn.querySelector('.sound-label').textContent = soundOn ? '音ON' : '音OFF';
+    if (soundOn) {
+        startTickSound(currentTickInterval);
+    } else {
+        stopTickSound();
+    }
 });
 
 // ============================================================
@@ -264,6 +316,8 @@ function updateDrops(dt) {
                 d.elapsed = 0;
                 ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 28, alpha: 0.65 });
                 surfaceWaves.push({ x: d.x, amp: 3.5, elapsed: 0 });
+                // 着水タイミングで音を鳴らす
+                if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
             }
 
         } else if (d.phase === 'splash') {

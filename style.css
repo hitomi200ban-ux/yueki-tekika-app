@@ -435,6 +435,39 @@ h1 {
     font-weight: bold;
 }
 
+/* 音ON/OFFボタン */
+.sound-toggle-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.sound-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1.5px solid #b3e5fc;
+    border-radius: 50px;
+    background: #fff;
+    color: #90a4ae;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sound-btn[data-on="true"] {
+    border-color: #4fc3f7;
+    background: #e1f5fe;
+    color: #0288d1;
+}
+
+.sound-icon {
+    font-size: 16px;
+}
+
 /* アニメーションコンテナ */
 .animation-container {
     background: linear-gradient(180deg, #f5f9fc 0%, #e8f4f8 100%);
