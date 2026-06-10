@@ -173,21 +173,237 @@ backBtn.addEventListener('click', () => {
 });
 
 // ============================================================
-// 水滴アニメーション
+// Canvas滴下アニメーション（画像スプライト方式）
 // ============================================================
-function startDropAnimation(interval) {
+const canvas     = document.getElementById('dropCanvas');
+const ctx        = canvas.getContext('2d');
+const chamberImg = document.getElementById('chamberImg');
+
+// 水滴画像の事前読み込み
+const dropImgs = [null, null, null, null];
+[1,2,3,4].forEach(i => {
+    const img = new Image();
+    img.src = './img/seizin_tekika' + i + '.PNG';
+    dropImgs[i - 1] = img;
+});
+
+// seizinyou_tekika.PNG上の緑先端位置（画像サイズに対する割合）
+const TIP_RATIO = { x: 0.50, y: 0.295 };
+
+// 将来: liquidLevel(0〜1)を残量と連動させると液面が変化する
+let liquidLevel = 0.62;
+
+let tipX = 0, tipY = 0, canvasW = 0, canvasH = 0;
+let animFrameId    = null;
+let dropIntervalId = null;
+let lastTime       = null;
+let drops          = [];
+let ripples        = [];
+let surfaceWaves   = [];
+
+// 各フェーズの画像サイズ（canvas px）
+const DROP_SIZE = {
+    grow:   { w: 22, h: 14 },
+    fall:   { w: 26, h: 26 },
+    splash: { w: 36, h: 22 },
+};
+
+// フェーズ継続時間（ms）
+const PHASE_MS = { grow: 480 };
+// 着水フェード時間（ms）
+const SPLASH_MS = 220;
+
+function initCanvas() {
+    canvasW = chamberImg.offsetWidth;
+    canvasH = chamberImg.offsetHeight;
+    canvas.width  = canvasW;
+    canvas.height = canvasH;
+    canvas.style.width  = canvasW + 'px';
+    canvas.style.height = canvasH + 'px';
+    tipX = canvasW * TIP_RATIO.x;
+    tipY = canvasH * TIP_RATIO.y;
+}
+
+function getSurfaceY() {
+    // seizinyou_tekika.PNG の水面位置に固定（画像高さの約62%）
+    return canvasH * 0.62;
+}
+
+function spawnDrop() {
+    drops.push({
+        phase: 'grow',
+        x: tipX,
+        y: tipY + DROP_SIZE.grow.h,
+        vy: 0,
+        elapsed: 0,   // フェーズ内の経過ms
+    });
+}
+
+function updateDrops(dt) {
+    const surfaceY = getSurfaceY();
+    // 物理: 60fps基準で正規化
+    const dtFactor = dt / (1000 / 60);
+
+    drops = drops.filter(d => {
+        d.elapsed += dt;
+
+        if (d.phase === 'grow') {
+            if (d.elapsed >= PHASE_MS.grow) {
+                d.phase   = 'fall';
+                d.elapsed = 0;
+                d.vy      = 1.8;
+            }
+
+        } else if (d.phase === 'fall') {
+            d.vy += 0.32 * dtFactor;
+            d.y  += d.vy * dtFactor;
+            const splashThreshold = surfaceY - DROP_SIZE.splash.h * 0.3;
+            if (d.y >= splashThreshold) {
+                d.phase   = 'splash';
+                d.y       = surfaceY;
+                d.elapsed = 0;
+                ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 28, alpha: 0.65 });
+                surfaceWaves.push({ x: d.x, amp: 3.5, elapsed: 0 });
+            }
+
+        } else if (d.phase === 'splash') {
+            if (d.elapsed >= SPLASH_MS) return false;
+        }
+        return true;
+    });
+}
+
+function updateRipples(dt) {
+    const dtFactor = dt / (1000 / 60);
+    ripples = ripples.filter(rp => {
+        rp.r     += (rp.maxR - rp.r) * 0.10 * dtFactor;
+        rp.alpha -= 0.018 * dtFactor;
+        return rp.alpha > 0;
+    });
+    surfaceWaves = surfaceWaves.filter(w => {
+        w.elapsed += dt;
+        w.amp     *= Math.pow(0.88, dtFactor);
+        return w.amp > 0.10;
+    });
+}
+
+function drawSurface() {
+    const surfaceY = getSurfaceY();
+    // チャンバー内部の左右端（画像幅に対する割合）
+    const clipLeft  = canvasW * 0.32;
+    const clipRight = canvasW * 0.68;
+    const clipTop   = canvasH * 0.33;
+    const clipBot   = canvasH * 0.88;
+
+    const steps = 40;
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+        const px = clipLeft + ((clipRight - clipLeft) / steps) * i;
+        let py = surfaceY;
+        surfaceWaves.forEach(sw => {
+            const dist = px - sw.x;
+            const t = sw.elapsed / 1000;
+            py += sw.amp * Math.sin((dist / 16) - t * 18) *
+                  Math.exp(-dist * dist / (canvasW * canvasW * 0.4));
+        });
+        pts.push({ px, py });
+    }
+
+    ctx.save();
+    // チャンバー内部のみ描画
+    ctx.beginPath();
+    ctx.rect(clipLeft, clipTop, clipRight - clipLeft, clipBot - clipTop);
+    ctx.clip();
+
+    ripples.forEach(rp => {
+        ctx.beginPath();
+        ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.28, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(180,180,180,${rp.alpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+    });
+    ctx.beginPath();
+    ctx.moveTo(pts[0].px, pts[0].py);
+    pts.forEach(p => ctx.lineTo(p.px, p.py));
+    ctx.strokeStyle = 'rgba(180,180,180,0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function drawDrops() {
+    drops.forEach(d => {
+        if (d.phase === 'grow') {
+            // tekika1: 成長アニメーション（徐々に拡大）
+            const progress = Math.min(d.elapsed / PHASE_MS.grow, 1);
+            const sw = DROP_SIZE.grow.w * progress;
+            const sh = DROP_SIZE.grow.h * progress;
+            const img = dropImgs[0];
+            if (img && img.complete && sw > 0) {
+                ctx.drawImage(img, tipX - sw / 2 - 1, tipY, sw, sh);
+            }
+
+        } else if (d.phase === 'fall') {
+            // tekika3: 落下中・速度に応じて縦方向にわずかに伸びる
+            const stretch = Math.min(1 + d.vy * 0.022, 1.25);
+            const sw = DROP_SIZE.fall.w;
+            const sh = DROP_SIZE.fall.h * stretch;
+            const img = dropImgs[2];
+            if (img && img.complete) {
+                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+            }
+
+        } else if (d.phase === 'splash') {
+            // tekika4: 着水・フェードアウト
+            const alpha = 1 - d.elapsed / SPLASH_MS;
+            const sw = DROP_SIZE.splash.w;
+            const sh = DROP_SIZE.splash.h;
+            const img = dropImgs[3];
+            if (img && img.complete) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(alpha, 0);
+                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+                ctx.restore();
+            }
+        }
+    });
+}
+
+function renderFrame(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const dt = Math.min(timestamp - lastTime, 50); // 最大50ms（タブ非表示復帰対策）
+    lastTime = timestamp;
+
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    updateDrops(dt);
+    updateRipples(dt);
+    drawSurface();
+    drawDrops();
+    animFrameId = requestAnimationFrame(renderFrame);
+}
+
+function startDropAnimation(intervalSec) {
     stopDropAnimation();
-    const createDrop = () => {
-        const drop = document.createElement('div');
-        drop.className = 'drop';
-        dropArea.appendChild(drop);
-        setTimeout(() => drop.remove(), 2500);
+    const doStart = () => {
+        initCanvas();
+        drops = []; ripples = []; surfaceWaves = [];
+        lastTime = null;
+        renderFrame(performance.now());
+        spawnDrop();
+        dropIntervalId = setInterval(spawnDrop, intervalSec * 1000);
     };
-    createDrop();
-    dropAnimationInterval = setInterval(createDrop, interval * 1000);
+    if (chamberImg.complete && chamberImg.naturalWidth > 0) {
+        doStart();
+    } else {
+        chamberImg.onload = doStart;
+    }
 }
 
 function stopDropAnimation() {
-    if (dropAnimationInterval) { clearInterval(dropAnimationInterval); dropAnimationInterval = null; }
-    if (dropArea) { dropArea.querySelectorAll('.drop').forEach(d => d.remove()); }
+    if (animFrameId)    { cancelAnimationFrame(animFrameId); animFrameId = null; }
+    if (dropIntervalId) { clearInterval(dropIntervalId); dropIntervalId = null; }
+    drops = []; ripples = []; surfaceWaves = [];
+    lastTime = null;
+    if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
 }
