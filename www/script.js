@@ -7,7 +7,7 @@ let currentIndex = 0;
 let manualVolume = null;
 let confirmedIndex = null;
 
-const volumes = [500, 200, 100, 50, null];
+const volumes = [1500, 500, 200, 100, 50, null];
 
 // ============================================================
 // 要素取得
