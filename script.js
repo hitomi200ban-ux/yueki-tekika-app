@@ -204,8 +204,8 @@ let surfaceWaves   = [];
 // 各フェーズの画像サイズ（canvas px）
 const DROP_SIZE = {
     grow:   { w: 22, h: 14 },
-    fall:   { w: 26, h: 26 },
-    splash: { w: 36, h: 22 },
+    fall:   { w: 23, h: 23 },
+    splash: { w: 32, h: 20 },
 };
 
 // フェーズ継続時間（ms）
