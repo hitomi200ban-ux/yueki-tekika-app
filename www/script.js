@@ -160,7 +160,18 @@ calculateBtn.addEventListener('click', () => {
 
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
-    startDropAnimation(dropInterval);
+
+    if (selectedType === 'child') {
+        document.getElementById('chamberAdult').style.display = 'none';
+        document.getElementById('chamberChild').style.display = 'block';
+        stopDropAnimation();
+        startChildDropAnimation(dropInterval);
+    } else {
+        document.getElementById('chamberAdult').style.display = 'block';
+        document.getElementById('chamberChild').style.display = 'none';
+        stopChildDropAnimation();
+        startDropAnimation(dropInterval);
+    }
     startTickSound(dropInterval);
 });
 
@@ -169,6 +180,7 @@ calculateBtn.addEventListener('click', () => {
 // ============================================================
 backBtn.addEventListener('click', () => {
     stopDropAnimation();
+    stopChildDropAnimation();
     stopTickSound();
     resultScreen.classList.remove('active');
     inputScreen.classList.add('active');
@@ -460,4 +472,197 @@ function stopDropAnimation() {
     drops = []; ripples = []; surfaceWaves = [];
     lastTime = null;
     if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
+}
+
+// ============================================================
+// 小児用Canvas滴下アニメーション（成人用と独立）
+// ============================================================
+const canvasC      = document.getElementById('dropCanvasChild');
+const ctxC         = canvasC.getContext('2d');
+const chamberImgC  = document.getElementById('chamberImgChild');
+
+// sixyouni_tekika.PNG: 針先は幅50%・高さ約36%、液面約60%
+const CHILD_TIP_RATIO    = { x: 0.50, y: 0.227 };
+const CHILD_SURFACE_Y    = 0.585;
+const CHILD_CLIP = { left: 0.30, right: 0.70, top: 0.36, bot: 0.88 };
+const CHILD_DROP_SIZE = {
+    grow:   { w: 8, h: 6  },
+    fall:   { w: 13, h: 13 },
+    splash: { w: 18, h: 11 },
+};
+
+let cAnimFrameId    = null;
+let cDropIntervalId = null;
+let cLastTime       = null;
+let cDrops          = [];
+let cRipples        = [];
+let cSurfaceWaves   = [];
+let cCanvasW = 0, cCanvasH = 0;
+let cTipX = 0, cTipY = 0;
+
+function initCanvasC() {
+    cCanvasW = chamberImgC.offsetWidth;
+    cCanvasH = chamberImgC.offsetHeight;
+    canvasC.width  = cCanvasW;
+    canvasC.height = cCanvasH;
+    canvasC.style.width  = cCanvasW + 'px';
+    canvasC.style.height = cCanvasH + 'px';
+    cTipX = cCanvasW * CHILD_TIP_RATIO.x;
+    cTipY = cCanvasH * CHILD_TIP_RATIO.y;
+}
+
+function getSurfaceYC() { return cCanvasH * CHILD_SURFACE_Y; }
+
+function spawnDropC() {
+    cDrops.push({ phase: 'grow', x: cTipX, y: cTipY, vy: 0, elapsed: 0 });
+}
+
+function updateDropsC(dt) {
+    const surfaceY = getSurfaceYC();
+    const dtF = dt / (1000 / 60);
+    cDrops = cDrops.filter(d => {
+        d.elapsed += dt;
+        if (d.phase === 'grow') {
+            if (d.elapsed >= 480) { d.phase = 'fall'; d.elapsed = 0; d.vy = 1.8; }
+        } else if (d.phase === 'fall') {
+            d.vy += 0.32 * dtF;
+            d.y  += d.vy * dtF;
+            if (d.y >= surfaceY - CHILD_DROP_SIZE.splash.h * 0.3) {
+                d.phase = 'splash'; d.y = surfaceY; d.elapsed = 0;
+                cRipples.push({ x: d.x, y: surfaceY, r: 2, maxR: 18, alpha: 0.60 });
+                cSurfaceWaves.push({ x: d.x, amp: 2.5, elapsed: 0 });
+                if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
+            }
+        } else if (d.phase === 'splash') {
+            if (d.elapsed >= 220) return false;
+        }
+        return true;
+    });
+}
+
+function updateRipplesC(dt) {
+    const dtF = dt / (1000 / 60);
+    cRipples = cRipples.filter(rp => {
+        rp.r     += (rp.maxR - rp.r) * 0.10 * dtF;
+        rp.alpha -= 0.018 * dtF;
+        return rp.alpha > 0;
+    });
+    cSurfaceWaves = cSurfaceWaves.filter(w => {
+        w.elapsed += dt;
+        w.amp     *= Math.pow(0.88, dtF);
+        return w.amp > 0.10;
+    });
+}
+
+function drawSurfaceC() {
+    const surfaceY = getSurfaceYC();
+    const clipL = cCanvasW * CHILD_CLIP.left;
+    const clipR = cCanvasW * CHILD_CLIP.right;
+    const clipT = cCanvasH * CHILD_CLIP.top;
+    const clipB = cCanvasH * CHILD_CLIP.bot;
+    const steps = 40;
+    const pts = [];
+    for (let i = 0; i <= steps; i++) {
+        const px = clipL + ((clipR - clipL) / steps) * i;
+        let py = surfaceY;
+        cSurfaceWaves.forEach(sw => {
+            const dist = px - sw.x;
+            const t = sw.elapsed / 1000;
+            py += sw.amp * Math.sin((dist / 14) - t * 18) *
+                  Math.exp(-dist * dist / (cCanvasW * cCanvasW * 0.4));
+        });
+        pts.push({ px, py });
+    }
+    ctxC.save();
+    ctxC.beginPath();
+    ctxC.rect(clipL, clipT, clipR - clipL, clipB - clipT);
+    ctxC.clip();
+    cRipples.forEach(rp => {
+        ctxC.beginPath();
+        ctxC.ellipse(rp.x, rp.y, rp.r, rp.r * 0.28, 0, 0, Math.PI * 2);
+        ctxC.strokeStyle = `rgba(180,180,180,${rp.alpha})`;
+        ctxC.lineWidth = 1.0;
+        ctxC.stroke();
+    });
+    ctxC.beginPath();
+    ctxC.moveTo(pts[0].px, pts[0].py);
+    pts.forEach(p => ctxC.lineTo(p.px, p.py));
+    ctxC.strokeStyle = 'rgba(180,180,180,0.45)';
+    ctxC.lineWidth = 1.2;
+    ctxC.stroke();
+    ctxC.restore();
+}
+
+function drawDropsC() {
+    cDrops.forEach(d => {
+        if (d.phase === 'grow') {
+            const progress = Math.min(d.elapsed / 480, 1);
+            const sw = CHILD_DROP_SIZE.grow.w * progress;
+            const sh = CHILD_DROP_SIZE.grow.h * progress;
+            const img = dropImgs[0];
+            if (img && img.complete && sw > 0)
+                ctxC.drawImage(img, cTipX - sw / 2 - 1, cTipY, sw, sh);
+        } else if (d.phase === 'fall') {
+            const stretch = Math.min(1 + d.vy * 0.022, 1.25);
+            const sw = CHILD_DROP_SIZE.fall.w;
+            const sh = CHILD_DROP_SIZE.fall.h * stretch;
+            const img = dropImgs[2];
+            if (img && img.complete)
+                ctxC.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+        } else if (d.phase === 'splash') {
+            const alpha = Math.max(1 - d.elapsed / 220, 0);
+            const sw = CHILD_DROP_SIZE.splash.w;
+            const sh = CHILD_DROP_SIZE.splash.h;
+            const img = dropImgs[3];
+            if (img && img.complete) {
+                ctxC.save();
+                ctxC.globalAlpha = alpha;
+                ctxC.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+                ctxC.restore();
+            }
+        }
+    });
+}
+
+function renderFrameC(timestamp) {
+    if (!cLastTime) cLastTime = timestamp;
+    const dt = Math.min(timestamp - cLastTime, 50);
+    cLastTime = timestamp;
+    ctxC.clearRect(0, 0, cCanvasW, cCanvasH);
+    updateDropsC(dt);
+    updateRipplesC(dt);
+    drawSurfaceC();
+    drawDropsC();
+    cAnimFrameId = requestAnimationFrame(renderFrameC);
+}
+
+function startChildDropAnimation(intervalSec) {
+    stopChildDropAnimation();
+    // display:noneの状態ではoffsetWidth/Heightが0になるため
+    // 表示切り替え後にrequestAnimationFrameで1フレーム待ってからinit
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const doStart = () => {
+                initCanvasC();
+                cDrops = []; cRipples = []; cSurfaceWaves = [];
+                cLastTime = null;
+                renderFrameC(performance.now());
+                spawnDropC();
+                cDropIntervalId = setInterval(spawnDropC, intervalSec * 1000);
+            };
+            if (chamberImgC.complete && chamberImgC.naturalWidth > 0) {
+                doStart();
+            } else {
+                chamberImgC.onload = doStart;
+            }
+        });
+    });
+}
+
+function stopChildDropAnimation() {
+    if (cAnimFrameId)    { cancelAnimationFrame(cAnimFrameId); cAnimFrameId = null; }
+    if (cDropIntervalId) { clearInterval(cDropIntervalId); cDropIntervalId = null; }
+    cDrops = []; cRipples = []; cSurfaceWaves = [];
+    cLastTime = null;
+    if (cCanvasW > 0) ctxC.clearRect(0, 0, cCanvasW, cCanvasH);
 }

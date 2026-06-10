@@ -490,7 +490,8 @@ h1 {
     height: auto;
 }
 
-#dropCanvas {
+#dropCanvas,
+#dropCanvasChild {
     position: absolute;
     top: 0;
     left: 0;
