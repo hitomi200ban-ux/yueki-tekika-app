@@ -73,10 +73,15 @@ function confirmSelection(index) {
 }
 
 function refreshVolumeLabel() {
-    if (confirmedIndex === null) { selectedVolumeText.textContent = '未選択'; return; }
-    selectedVolumeText.textContent = volumes[confirmedIndex] !== null
-        ? (volumes[confirmedIndex] + ' mL')
-        : (manualVolume ? (manualVolume + ' mL') : '未入力');
+    if (confirmedIndex === null) {
+        selectedVolumeText.textContent = '未選択';
+        return;
+    }
+    if (volumes[confirmedIndex] !== null) {
+        selectedVolumeText.textContent = volumes[confirmedIndex] + ' mL 選択中';
+    } else {
+        selectedVolumeText.textContent = manualVolume ? (manualVolume + ' mL 選択中') : '未入力';
+    }
 }
 
 document.querySelectorAll('.swiper-item:not([data-volume="manual"])').forEach((el, i) => {
