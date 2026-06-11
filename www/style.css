@@ -104,10 +104,21 @@ h1 {
     background: #fff;
 }
 
+.label-hint-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.label-hint-row label {
+    margin-bottom: 0;
+}
+
 .swipe-hint {
     font-size: 12px;
     color: #aaaaaa;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 /* 輸液量スワイパー */

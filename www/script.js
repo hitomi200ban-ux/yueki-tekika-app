@@ -543,7 +543,7 @@ const chamberImgC  = document.getElementById('chamberImgChild');
 // sixyouni_tekika.PNG: 針先は幅50%・高さ約36%、液面約60%
 const CHILD_TIP_RATIO    = { x: 0.50, y: 0.227 };
 const CHILD_SURFACE_Y    = 0.585;
-const CHILD_CLIP = { left: 0.30, right: 0.70, top: 0.36, bot: 0.88 };
+const CHILD_CLIP = { left: 0.32, right: 0.69, top: 0.36, bot: 0.88 };
 const CHILD_DROP_SIZE = {
     grow:   { w: 8, h: 6  },
     fall:   { w: 13, h: 13 },
