@@ -127,19 +127,19 @@ updateSwiper(1);
 // ============================================================
 document.getElementById('hourUp').addEventListener('click', () => {
     const sel = document.getElementById('hourSelect');
-    if (sel.selectedIndex > 0) { sel.selectedIndex--; updateSummary(); }
+    if (sel.selectedIndex < sel.options.length - 1) { sel.selectedIndex++; updateSummary(); }
 });
 document.getElementById('hourDown').addEventListener('click', () => {
     const sel = document.getElementById('hourSelect');
-    if (sel.selectedIndex < sel.options.length - 1) { sel.selectedIndex++; updateSummary(); }
+    if (sel.selectedIndex > 0) { sel.selectedIndex--; updateSummary(); }
 });
 document.getElementById('minuteUp').addEventListener('click', () => {
     const sel = document.getElementById('minuteSelect');
-    if (sel.selectedIndex > 0) { sel.selectedIndex--; updateSummary(); }
+    if (sel.selectedIndex < sel.options.length - 1) { sel.selectedIndex++; updateSummary(); }
 });
 document.getElementById('minuteDown').addEventListener('click', () => {
     const sel = document.getElementById('minuteSelect');
-    if (sel.selectedIndex < sel.options.length - 1) { sel.selectedIndex++; updateSummary(); }
+    if (sel.selectedIndex > 0) { sel.selectedIndex--; updateSummary(); }
 });
 
 // ============================================================

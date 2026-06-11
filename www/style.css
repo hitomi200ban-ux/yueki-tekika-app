@@ -366,9 +366,9 @@ h1 {
     background: none;
     border: none;
     color: #0288d1;
-    font-size: 14px;
+    font-size: 20px;
     cursor: pointer;
-    padding: 2px 8px;
+    padding: 6px 16px;
     line-height: 1;
     -webkit-tap-highlight-color: transparent;
 }
@@ -442,6 +442,7 @@ h1 {
     cursor: pointer;
     transition: all 0.25s ease;
     box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .calculate-btn:hover {
