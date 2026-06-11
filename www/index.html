@@ -114,14 +114,23 @@
 
                 <div class="result-3col">
 
-                    <!-- 左：滴下速度 -->
+                    <!-- 左：滴下速度（上）＋合わせ方（下） -->
                     <div class="result-left">
-                        <div class="rn-label">滴下速度</div>
-                        <div class="rn-rate-wrap">
-                            <span class="rn-rate" id="dropRate">--</span>
+                        <div class="result-left-top">
+                            <div class="rn-label">滴下速度</div>
+                            <div class="rn-rate-wrap">
+                                <span class="rn-rate" id="dropRate">--</span>
+                            </div>
+                            <div class="rn-unit">滴/分</div>
+                            <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
                         </div>
-                        <div class="rn-unit">滴/分</div>
-                        <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
+                        <div class="result-left-bottom">
+                            <div class="rn-label">合わせ方</div>
+                            <div class="rn-sec-wrap">
+                                <span class="rn-sec" id="dropIntervalSec">--</span>
+                            </div>
+                            <div class="rn-sec-unit">秒に1滴</div>
+                        </div>
                     </div>
 
                     <!-- 中央：アニメーション -->
@@ -136,15 +145,8 @@
                         </div>
                     </div>
 
-                    <!-- 右：合わせ方＋計算式ボタン -->
+                    <!-- 右：計算式ボタン -->
                     <div class="result-right">
-                        <div class="result-guide-block">
-                            <div class="rn-label">合わせ方</div>
-                            <div class="rn-sec-wrap">
-                                <span class="rn-sec" id="dropIntervalSec">--</span>
-                            </div>
-                            <div class="rn-sec-unit">秒に1滴</div>
-                        </div>
                         <div class="result-btns">
                             <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
                                 <span>計算式</span>

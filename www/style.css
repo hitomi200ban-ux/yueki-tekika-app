@@ -462,14 +462,6 @@ h1 {
     margin-bottom: 4px;
 }
 
-/* 1枚カード */
-.result-card {
-    background: #ffffff;
-    border: 2px solid #0288d1;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
 
 .result-card-top {
     padding: 18px 20px 16px;
@@ -753,12 +745,12 @@ h1 {
 
 /* 結果カード */
 .result-card {
-    background: linear-gradient(135deg, #e1f5fe 0%, #ffffff 100%);
+    background: #f8f8f8;
     border-radius: 20px;
     padding: 16px 0;
     display: flex;
     justify-content: center;
-    box-shadow: 0 2px 12px rgba(2, 136, 209, 0.1);
+    box-shadow: none;
     width: fit-content;
     margin: 0 auto;
     position: relative;
@@ -778,8 +770,16 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 0;
+    justify-content: space-between;
+    padding: 8px 0;
+    gap: 32px;
+}
+
+.result-left-top,
+.result-left-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* 中央：アニメーション（主役） */
@@ -828,7 +828,7 @@ h1 {
 }
 
 .rn-rate {
-    font-size: 52px;
+    font-size: 64px;
     font-weight: bold;
     color: #0277bd;
     line-height: 1;
@@ -852,7 +852,7 @@ h1 {
 }
 
 .rn-sec {
-    font-size: 52px;
+    font-size: 64px;
     font-weight: bold;
     color: #f57f17;
     line-height: 1;
