@@ -169,6 +169,7 @@ calculateBtn.addEventListener('click', () => {
     const m = parseInt(minuteSelect.value);
     const hours = h + m / 60;
     if (!volume || volume <= 0) { alert('輸液量を入力・決定してください。'); return; }
+    if (!selectedType) { alert('輸液ルートの種類を選択してください。'); return; }
     if (hours <= 0) { alert('投与時間を選択してください。'); return; }
 
     const dropFactor = selectedType === 'adult' ? 20 : 60;
