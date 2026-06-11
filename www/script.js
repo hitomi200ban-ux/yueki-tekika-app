@@ -183,6 +183,10 @@ calculateBtn.addEventListener('click', () => {
     dropRateDisplay.textContent = dropRateFloor;
     document.getElementById('dropRateExact').textContent = dropRateExact;
     document.getElementById('dropIntervalSec').textContent = secPerDrop;
+
+    const secColor = selectedType === 'adult' ? '#66bb6a' : '#f48fb1';
+    document.getElementById('dropIntervalSec').style.color = secColor;
+    document.querySelectorAll('.rn-sec-unit').forEach(el => el.style.color = secColor);
     document.getElementById('fVolume').textContent   = volume;
     document.getElementById('fDrop').textContent     = dropFactor;
     document.getElementById('fHour').textContent     = parseInt(hourSelect.value);

@@ -7,6 +7,7 @@
 
 html {
     height: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -15,6 +16,7 @@ body {
     min-height: 100vh;
     height: 100%;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 .container {
@@ -766,13 +768,13 @@ h1 {
 
 /* 左：滴下速度 */
 .result-left {
-    flex: 0 0 72px;
+    flex: 0 0 88px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     padding: 8px 0;
-    gap: 32px;
+    gap: 48px;
 }
 
 .result-left-top,
@@ -828,15 +830,15 @@ h1 {
 }
 
 .rn-rate {
-    font-size: 64px;
+    font-size: clamp(36px, 12vw, 64px);
     font-weight: bold;
     color: #0277bd;
     line-height: 1;
-    letter-spacing: -3px;
+    letter-spacing: -2px;
 }
 
 .rn-unit {
-    font-size: 13px;
+    font-size: 18px;
     font-weight: bold;
     color: #0288d1;
     margin-top: 1px;
@@ -852,15 +854,15 @@ h1 {
 }
 
 .rn-sec {
-    font-size: 64px;
+    font-size: clamp(36px, 12vw, 64px);
     font-weight: bold;
     color: #f57f17;
     line-height: 1;
-    letter-spacing: -3px;
+    letter-spacing: -2px;
 }
 
 .rn-sec-unit {
-    font-size: 13px;
+    font-size: 22px;
     font-weight: bold;
     color: #f57f17;
     margin-top: 1px;
@@ -871,20 +873,20 @@ h1 {
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    width: 54px;
-    padding: 10px 4px;
+    width: 62px;
+    padding: 12px 4px;
     border: 1.5px solid #b3e5fc;
     border-radius: 14px;
     background: #fff;
     color: #90a4ae;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
 
 .sound-btn-v .sound-icon {
-    font-size: 26px;
+    font-size: 30px;
 }
 
 .sound-btn-v .sound-label-v {
@@ -900,15 +902,15 @@ h1 {
 .sound-btn-corner {
     position: absolute;
     top: 8px;
-    right: 8px;
+    right: 12px;
 }
 
 .formula-toggle-v {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 54px;
-    padding: 8px 4px;
+    width: 62px;
+    padding: 10px 4px;
     border: 1.5px solid #b3e5fc;
     border-radius: 12px;
     background: #fff;
@@ -920,7 +922,7 @@ h1 {
     text-align: center;
     position: absolute;
     bottom: 8px;
-    right: 8px;
+    right: 12px;
 }
 
 .formula-toggle-v[aria-expanded="true"] {
