@@ -207,6 +207,11 @@ backBtn.addEventListener('click', () => {
     stopDropAnimation();
     stopChildDropAnimation();
     stopTickSound();
+    // 音をOFFにリセット
+    soundOn = false;
+    soundBtn.dataset.on = 'false';
+    soundBtn.querySelector('.sound-icon').textContent    = '🔇';
+    soundBtn.querySelector('.sound-label-v').textContent = '音OFF';
     // アコーディオンをリセット
     document.getElementById('formulaToggle').setAttribute('aria-expanded', 'false');
     document.getElementById('formulaBody').classList.remove('open');
