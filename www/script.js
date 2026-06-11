@@ -116,7 +116,7 @@ document.getElementById('manualConfirmBtn').addEventListener('click', () => {
     const val = parseFloat(document.getElementById('manualVolume').value);
     if (!val || val <= 0) { alert('正しい数値を入力してください。'); return; }
     manualVolume = val;
-    confirmSelection(4);
+    confirmSelection(5);
     document.getElementById('manualConfirmBtn').classList.add('decided');
 });
 
@@ -157,7 +157,7 @@ calculateBtn.addEventListener('click', () => {
 
     const dropRateFloor = Math.floor(dropRate);
     const dropRateExact = dropRate.toFixed(1);
-    const secPerDrop = Math.round(60 / dropRate);
+    const secPerDrop = (60 / dropRate).toFixed(1);
 
     dropRateDisplay.textContent = dropRateFloor;
     document.getElementById('dropRateExact').textContent = dropRateExact;
