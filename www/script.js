@@ -2,7 +2,6 @@
 // 状態変数
 // ============================================================
 let selectedType = null;
-let dropAnimationInterval = null;
 let currentIndex = 0;
 let manualVolume = null;
 let confirmedIndex = null;
@@ -69,6 +68,10 @@ function confirmSelection(index) {
         el.classList.toggle('confirmed', i === index);
         el.classList.remove('browsing');
     });
+    // 手動以外が選択されたら決定ボタンをリセット
+    if (index !== 5) {
+        document.getElementById('manualConfirmBtn').classList.remove('decided');
+    }
     refreshVolumeLabel();
     updateSummary();
 }
@@ -176,11 +179,11 @@ calculateBtn.addEventListener('click', () => {
     const dropRate = (volume * dropFactor) / (hours * 60);
     const dropInterval = 60 / dropRate;
 
-    const dropRateFloor = Math.floor(dropRate);
+    const dropRateRound = Math.round(dropRate);
     const dropRateExact = dropRate.toFixed(1);
     const secPerDrop = (60 / dropRate).toFixed(1);
 
-    dropRateDisplay.textContent = dropRateFloor;
+    dropRateDisplay.textContent = dropRateRound;
     document.getElementById('dropRateExact').textContent = dropRateExact;
     document.getElementById('dropIntervalSec').textContent = secPerDrop;
 
@@ -194,8 +197,6 @@ calculateBtn.addEventListener('click', () => {
     document.getElementById('fTotalMin').textContent = Math.round(hours * 60);
     document.getElementById('fExact').textContent    = dropRate.toFixed(1);
     document.getElementById('fApprox').textContent   = Math.round(dropRate);
-    dropIntervalDisplay.textContent = dropInterval.toFixed(2);
-
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
     document.body.style.padding = '0';
