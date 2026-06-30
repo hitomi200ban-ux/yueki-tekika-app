@@ -2,6 +2,7 @@
 // 状態変数
 // ============================================================
 let selectedType = 'adult';
+let typeSelected = false;
 let dropAnimationInterval = null;
 let currentIndex = 0;
 let manualVolume = null;
@@ -45,7 +46,7 @@ function updateSummary() {
     const m = parseInt(minuteSelect.value);
     const totalMin = h * 60 + m;
     document.getElementById('summaryVolume').textContent = vol ? vol : '--';
-    document.getElementById('summaryDrop').textContent = selectedType === 'adult' ? '20' : '60';
+    document.getElementById('summaryDrop').textContent = typeSelected ? (selectedType === 'adult' ? '20' : '60') : '--';
     document.getElementById('summaryHour').textContent = h;
     document.getElementById('summaryMin').textContent = String(m).padStart(2, '0');
     document.getElementById('summaryTotalMin').textContent = totalMin;
@@ -127,6 +128,7 @@ updateSwiper(0);
 // ============================================================
 adultBtn.addEventListener('click', () => {
     selectedType = 'adult';
+    typeSelected = true;
     adultBtn.classList.add('active');
     childBtn.classList.remove('active');
     updateSummary();
@@ -134,6 +136,7 @@ adultBtn.addEventListener('click', () => {
 
 childBtn.addEventListener('click', () => {
     selectedType = 'child';
+    typeSelected = true;
     childBtn.classList.add('active');
     adultBtn.classList.remove('active');
     updateSummary();
