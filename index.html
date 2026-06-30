@@ -1,28 +1,25 @@
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>分かりやすい輸液滴下計算アプリ</title>
+    <title>輸液滴下計算 | 看護師・看護学生向け点滴滴下計算アプリ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <!-- 入力画面 -->
         <div id="inputScreen" class="screen active">
-            <h1>💧 輸液滴下計算</h1>
+            <div class="app-title-wrap">
+                <h1 class="app-title">輸液滴下計算</h1>
+                <p class="app-subtitle">看護師・看護学生向け点滴滴下計算アプリ</p>
+            </div>
 
             <div class="form-group">
-                <label>輸液量</label>
-                <p class="swipe-hint">左右にスワイプ・タップで選択</p>
+                <div class="label-hint-row">
+                    <label>輸液量</label>
+                    <p class="swipe-hint">左右にスワイプ・タップで選択</p>
+                </div>
                 <div class="volume-swiper-wrapper">
                     <button class="swiper-arrow left" id="prevBtn">&#8249;</button>
                     <div class="volume-swiper">
@@ -49,7 +46,7 @@
             <div class="form-group">
                 <label>輸液ルートの種類</label>
                 <div class="button-group">
-                    <button id="adultBtn" class="type-btn active" data-type="adult">
+                    <button id="adultBtn" class="type-btn" data-type="adult">
                         <img src="./img/seizinyou.PNG" alt="成人用">
                         <span>成人用（20滴/mL）</span>
                     </button>
@@ -61,26 +58,37 @@
             </div>
 
             <div class="form-group">
-                <label>投与時間</label>
+                <div class="label-hint-row">
+                    <label>投与時間</label>
+                    <p class="swipe-hint">数字をタップして選択</p>
+                </div>
                 <div class="time-card">
-                    <select id="hourSelect" class="time-select">
-                        <option value="0">0</option><option value="1" selected>1</option><option value="2">2</option>
-                        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                        <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                        <option value="9">9</option><option value="10">10</option><option value="11">11</option>
-                        <option value="12">12</option><option value="13">13</option><option value="14">14</option>
-                        <option value="15">15</option><option value="16">16</option><option value="17">17</option>
-                        <option value="18">18</option><option value="19">19</option><option value="20">20</option>
-                        <option value="21">21</option><option value="22">22</option><option value="23">23</option>
-                        <option value="24">24</option>
-                    </select>
+                    <div class="time-spinner-wrap">
+                        <button class="time-arrow-btn" id="hourUp">▲</button>
+                        <select id="hourSelect" class="time-select">
+                            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                            <option value="6">6</option><option value="7">7</option><option value="8" selected>8</option>
+                            <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+                            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                            <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            <option value="24">24</option>
+                        </select>
+                        <button class="time-arrow-btn" id="hourDown">▼</button>
+                    </div>
                     <span class="time-label">時間</span>
-                    <select id="minuteSelect" class="time-select">
-                        <option value="0" selected>00</option>
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="45">45</option>
-                    </select>
+                    <div class="time-spinner-wrap">
+                        <button class="time-arrow-btn" id="minuteUp">▲</button>
+                        <select id="minuteSelect" class="time-select">
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                        <button class="time-arrow-btn" id="minuteDown">▼</button>
+                    </div>
                     <span class="time-label">分</span>
                 </div>
             </div>
@@ -96,30 +104,88 @@
         </div>
 
         <!-- 結果画面 -->
-        <div id="resultScreen" class="screen">
-            <h1>💧 滴下速度</h1>
+        <div id="resultScreen" class="screen result-screen-layout">
 
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">滴下数</span>
-                    <span class="result-value" id="dropRate">-- 滴/分</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">滴下間隔</span>
-                    <span class="result-value" id="dropInterval">-- 秒</span>
-                </div>
-            </div>
+            <div class="result-title">輸液滴下計算</div>
+            <div class="result-subtitle">看護師・看護学生向け点滴滴下計算アプリ</div>
 
-            <div class="animation-container">
-                <button id="soundBtn" class="sound-btn-overlay" data-on="false">
+            <!-- 3カラム：左数値・中央アニメ・右ボタン＋合わせ方 -->
+            <div class="result-card">
+                <!-- 右上：音ボタン -->
+                <button id="soundBtn" class="sound-btn-v sound-btn-corner" data-on="false">
                     <span class="sound-icon">🔇</span>
-                    <span class="sound-label">音OFF</span>
+                    <span class="sound-label-v">音OFF</span>
                 </button>
-                <div class="chamber-wrap">
-                    <img src="./img/seizinyou_tekika.PNG" id="chamberImg" class="chamber-img" alt="滴下チャンバー">
-                    <canvas id="dropCanvas"></canvas>
+
+                <div class="result-3col">
+
+                    <!-- 左：滴下速度（上）＋合わせ方（下） -->
+                    <div class="result-left">
+                        <div class="result-left-top">
+                            <div class="rn-label">滴下速度</div>
+                            <div class="rn-rate-wrap">
+                                <span class="rn-rate" id="dropRate">--</span>
+                            </div>
+                            <div class="rn-unit">滴/分</div>
+                            <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
+                        </div>
+                        <div class="result-left-bottom">
+                            <div class="rn-label">合わせ方</div>
+                            <div class="rn-sec-wrap">
+                                <span class="rn-sec" id="dropIntervalSec">--</span>
+                            </div>
+                            <div class="rn-sec-unit">秒に1滴</div>
+                        </div>
+                    </div>
+
+                    <!-- 中央：アニメーション -->
+                    <div class="result-center">
+                        <div class="chamber-wrap" id="chamberAdult">
+                            <img src="./img/seizinyou_tekika.PNG" id="chamberImg" class="chamber-img">
+                            <canvas id="dropCanvas"></canvas>
+                        </div>
+                        <div class="chamber-wrap" id="chamberChild" style="display:none;">
+                            <img src="./img/sixyouni_tekika.PNG" id="chamberImgChild" class="chamber-img">
+                            <canvas id="dropCanvasChild"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 右：計算式ボタン -->
+                    <div class="result-right">
+                        <div class="result-btns">
+                            <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
+                                <span>計算式</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- 計算式パネル（タップで表示） -->
+            <div class="formula-body" id="formulaBody">
+                <div class="formula-inner">
+                    <div class="formula-line">
+                        <span class="formula-val" id="fVolume">--</span><span class="formula-unit">mL</span>
+                        <span class="formula-op"> × </span>
+                        <span class="formula-val" id="fDrop">--</span><span class="formula-unit">滴/mL</span>
+                    </div>
+                    <div class="formula-divider"></div>
+                    <div class="formula-line formula-time">
+                        <span class="formula-val" id="fHour">--</span><span class="formula-unit">時間</span>
+                        <span class="formula-val" id="fMin">--</span><span class="formula-unit">分</span>
+                        <span class="formula-paren">（<span id="fTotalMin">--</span>分）</span>
+                    </div>
+                    <div class="formula-result-line">
+                        <span class="formula-eq">= </span><span class="formula-exact" id="fExact">--</span><span class="formula-unit"> 滴/分</span>
+                    </div>
+                    <div class="formula-result-line">
+                        <span class="formula-eq">≈ </span><span class="formula-approx" id="fApprox">--</span><span class="formula-unit"> 滴/分</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 旧IDを維持（アニメーション用） -->
+            <span id="dropInterval" style="display:none;"></span>
 
             <button id="backBtn" class="back-btn">戻る</button>
         </div>

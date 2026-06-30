@@ -5,11 +5,15 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meiryo', sans-serif;
     background: #ffffff;
-    min-height: 100vh;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 .container {
@@ -49,6 +53,24 @@ h1 {
     font-weight: bold;
 }
 
+.app-title-wrap {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.app-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0288d1;
+    margin-bottom: 4px;
+}
+
+.app-subtitle {
+    font-size: 15px;
+    color: #0288d1;
+    font-weight: normal;
+}
+
 /* フォームグループ */
 .form-group {
     margin-bottom: 24px;
@@ -78,10 +100,21 @@ h1 {
     background: #fff;
 }
 
+.label-hint-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.label-hint-row label {
+    margin-bottom: 0;
+}
+
 .swipe-hint {
     font-size: 12px;
     color: #aaaaaa;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 /* 輸液量スワイパー */
@@ -317,12 +350,36 @@ h1 {
     background: transparent;
     -webkit-appearance: none;
     appearance: none;
+    accent-color: #0288d1;
+}
+
+.time-select:focus {
+    outline: 2px solid #0288d1;
+    border-radius: 4px;
 }
 
 .time-label {
     font-size: 16px;
     font-weight: bold;
     color: #455a64;
+}
+
+.time-spinner-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.time-arrow-btn {
+    background: none;
+    border: none;
+    color: #0288d1;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 16px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .picker-highlight {
@@ -352,10 +409,10 @@ h1 {
 
 /* 計算式ラベル */
 .summary-title {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 6px;
-    margin-left: 2px;
+    font-size: 16px;
+    color: #455a64;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
 /* 最終確認サマリー */
@@ -394,6 +451,7 @@ h1 {
     cursor: pointer;
     transition: all 0.25s ease;
     box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .calculate-btn:hover {
@@ -405,11 +463,194 @@ h1 {
 }
 
 /* 結果表示 */
+.result-section-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #90a4ae;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+
+.result-card-top {
+    padding: 18px 20px 16px;
+}
+
+.result-card-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.result-card-block {
+    flex: 1;
+    text-align: center;
+}
+
+.result-card-divider-v {
+    width: 1px;
+    height: 56px;
+    background: #b3e5fc;
+    margin: 0 8px;
+}
+
+.result-rate-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.result-rate-value {
+    font-size: 44px;
+    font-weight: bold;
+    color: #0277bd;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.result-rate-unit {
+    font-size: 15px;
+    color: #0288d1;
+    font-weight: bold;
+}
+
+.result-guide-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+}
+
+.result-guide-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #f57f17;
+    line-height: 1;
+}
+
+.result-guide-unit {
+    font-size: 15px;
+    font-weight: bold;
+    color: #f57f17;
+}
+
+/* 計算式アコーディオン */
+.formula-toggle {
+    width: 100%;
+    padding: 10px 20px;
+    background: #f0f9ff;
+    border: none;
+    border-top: 1px solid #b3e5fc;
+    color: #0288d1;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.formula-toggle-arrow {
+    font-size: 11px;
+    transition: transform 0.25s ease;
+    display: inline-block;
+}
+
+.formula-toggle[aria-expanded="true"] .formula-toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.formula-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    margin-bottom: 6px;
+}
+
+.formula-body.open {
+    border: 2px solid #0288d1;
+}
+
+.formula-body.open {
+    max-height: 300px;
+}
+
+.formula-inner {
+    padding: 14px 20px 16px;
+}
+
+.formula-line {
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    line-height: 1.8;
+}
+
+.formula-val {
+    font-weight: bold;
+    color: #0288d1;
+    font-size: 17px;
+}
+
+.formula-unit {
+    color: #555;
+    font-size: 13px;
+}
+
+.formula-op {
+    color: #333;
+    font-size: 16px;
+}
+
+.formula-divider {
+    border-top: 2px solid #000;
+    margin: 4px 10%;
+}
+
+.formula-time {
+    color: #555;
+}
+
+.formula-paren {
+    color: #888;
+    font-size: 13px;
+}
+
+.formula-result-line {
+    text-align: center;
+    line-height: 1.9;
+}
+
+.formula-eq {
+    color: #555;
+    font-size: 15px;
+}
+
+.formula-exact {
+    font-size: 17px;
+    font-weight: bold;
+    color: #555;
+}
+
+.formula-approx {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0277bd;
+}
+
+/* 旧スタイル（互換） */
 .result-box {
     background: linear-gradient(135deg, #e1f5fe 0%, #ffffff 100%);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 30px;
+    display: none;
 }
 
 .result-item {
@@ -437,8 +678,9 @@ h1 {
 
 /* 音ON/OFFボタン */
 .sound-toggle-wrap {
-    /* animation-container 内で position:absolute で右上に配置するため非表示化 */
-    display: none;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
 }
 
 .sound-btn {
@@ -455,7 +697,6 @@ h1 {
     cursor: pointer;
     transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
 }
 
 .sound-btn[data-on="true"] {
@@ -468,93 +709,285 @@ h1 {
     font-size: 16px;
 }
 
-/* アニメーションコンテナ：相対配置の基点 */
-.animation-container {
+/* 結果画面タイトル */
+.result-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #0288d1;
+}
+
+.result-subtitle {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #0288d1;
+}
+
+/* 結果画面レイアウト */
+.result-screen-layout {
+    padding: 76px 8px 16px !important;
+    margin: 0 !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* 画面全体を使い切る */
+    min-height: 100dvh;
     position: relative;
-    background: linear-gradient(180deg, #f5f9fc 0%, #e8f4f8 100%);
-    border-radius: 16px;
-    padding: 12px;
-    margin-bottom: 24px;
+    box-sizing: border-box;
+}
+
+.result-screen-layout.active {
+    display: flex !important;
+}
+
+/* 結果カード：余った縦スペースをすべて使う */
+.result-card {
+    background: #f8f8f8;
+    border-radius: 20px;
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+    box-shadow: none;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 12px;
+    position: relative;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+}
+
+/* 3カラムレイアウト */
+.result-3col {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0;
+    /* はみ出し防止 */
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* 左：滴下速度 */
+.result-left {
+    flex: 0 0 80px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    gap: 48px;
+}
+
+.result-left-top,
+.result-left-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 中央：アニメーション（主役） */
+.result-center {
+    flex: 1 1 auto;
+    min-width: 0;
+    /* 高さをresult-cardから継承して画像を縦に広げる */
+    align-self: stretch;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* 利用可能な縦スペースを flex で使い切る */
-    flex: 1 1 auto;
-    min-height: 0;
 }
 
-/* 音OFFボタン：コンテナ右上に絶対配置 */
-.animation-container .sound-btn-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
+/* 右：ボタン */
+.result-right {
+    flex: 0 0 72px;
+    min-width: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+}
+
+.result-guide-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.rn-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.rn-rate-wrap {
+    display: flex;
+    align-items: baseline;
+}
+
+.rn-rate {
+    font-size: clamp(28px, 9vw, 52px);
+    font-weight: bold;
+    color: #0277bd;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.rn-unit {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0288d1;
+    margin-top: 1px;
+}
+
+.rn-exact {
+    display: none;
+}
+
+.rn-sec-wrap {
+    display: flex;
+    align-items: baseline;
+}
+
+.rn-sec {
+    font-size: clamp(28px, 9vw, 52px);
+    font-weight: bold;
+    color: #f57f17;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.rn-sec-unit {
+    font-size: 22px;
+    font-weight: bold;
+    color: #f57f17;
+    margin-top: 1px;
+}
+
+.sound-btn-v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 62px;
+    padding: 12px 4px;
     border: 1.5px solid #b3e5fc;
-    border-radius: 50px;
-    background: rgba(255,255,255,0.92);
+    border-radius: 14px;
+    background: #fff;
     color: #90a4ae;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
 }
 
-.animation-container .sound-btn-overlay[data-on="true"] {
+.sound-btn-v .sound-icon {
+    font-size: 30px;
+}
+
+.sound-btn-v .sound-label-v {
+    font-size: 12px;
+}
+
+.sound-btn-v[data-on="true"] {
     border-color: #4fc3f7;
-    background: rgba(225,245,254,0.95);
+    background: #e1f5fe;
     color: #0288d1;
 }
 
-.chamber-wrap {
-    position: relative;
+.sound-btn-corner {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+}
+
+.formula-toggle-v {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    padding: 10px 4px;
+    border: 1.5px solid #b3e5fc;
+    border-radius: 12px;
+    background: #fff;
+    color: #0288d1;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+}
+
+.formula-toggle-v[aria-expanded="true"] {
+    background: #e1f5fe;
+    border-color: #0288d1;
+}
+
+/* アニメーションコンテナ */
+.animation-container {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.chamber-wrap {
+    position: relative;
+    display: inline-block;
+}
+
 .chamber-img {
     display: block;
-    /* 固定px廃止 → コンテナ幅・高さに応じて縮小 */
-    width: min(200px, 55vw);
-    max-height: 55vh;
-    height: auto;
+    width: 100%;
+    max-width: 200px;
+    /* result-cardが伸びた分、画像も縦いっぱいに */
+    height: 100%;
+    max-height: 70vh;
     object-fit: contain;
 }
 
-#dropCanvas {
+#dropCanvas,
+#dropCanvasChild {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
 }
 
-/* 結果画面全体を縦 flex にして高さを分配 */
-#resultScreen {
-    display: none;
-    flex-direction: column;
-    padding: 40px 30px;
-}
-
-#resultScreen.active {
-    display: flex;
-    animation: fadeIn 0.5s ease;
-}
-
-/* result-box は縮まない */
-.result-box {
-    flex-shrink: 0;
-}
-
 /* 戻るボタン */
 .back-btn {
     width: 100%;
-    padding: 14px;
+    padding: 10px;
     border: 2px solid #b3e5fc;
     border-radius: 12px;
     background: #fff;
@@ -573,17 +1006,11 @@ h1 {
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
     .screen {
-        padding: 24px 16px;
+        padding: 30px 20px;
     }
 
     h1 {
-        font-size: 22px;
-        margin-bottom: 16px;
-    }
-
-    .result-box {
-        padding: 16px;
-        margin-bottom: 16px;
+        font-size: 24px;
     }
 
     .result-value {
@@ -591,38 +1018,19 @@ h1 {
     }
 
     .animation-container {
-        padding: 10px;
-        margin-bottom: 16px;
+        min-height: unset;
+        padding: 0;
     }
 
-    .chamber-img {
-        width: min(180px, 52vw);
-        max-height: 48vh;
+    .drop-zone {
+        height: 400px;
     }
 
-    .back-btn {
-        flex-shrink: 0;
-    }
-}
-
-/* 極小端末（画面高さ 640px 以下）向け追加調整 */
-@media (max-height: 640px) {
-    h1 {
-        font-size: 20px;
-        margin-bottom: 10px;
+    .iv-chamber-img {
+        max-width: 150px;
     }
 
-    .result-box {
-        padding: 10px 16px;
-        margin-bottom: 10px;
-    }
-
-    .chamber-img {
-        width: min(150px, 45vw);
-        max-height: 40vh;
-    }
-
-    #resultScreen.active {
-        padding: 20px 16px;
+    #dropArea {
+        height: 350px;
     }
 }
