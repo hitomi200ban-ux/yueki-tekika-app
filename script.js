@@ -231,13 +231,6 @@ const canvas     = document.getElementById('dropCanvas');
 const ctx        = canvas.getContext('2d');
 const chamberImg = document.getElementById('chamberImg');
 
-// 水滴画像の事前読み込み
-const dropImgs = [null, null, null, null];
-[1,2,3,4].forEach(i => {
-    const img = new Image();
-    img.src = './img/seizin_tekika' + i + '.PNG';
-    dropImgs[i - 1] = img;
-});
 
 // seizinyou_tekika.PNG上の緑先端位置（画像サイズに対する割合）
 const TIP_RATIO = { x: 0.50, y: 0.295 };
@@ -255,17 +248,10 @@ let surfaceWaves     = [];
 let dropSpawnTimer   = 0;
 let dropSpawnInterval = 1.0;
 
-// 各フェーズの画像サイズ（canvas px）
-const DROP_SIZE = {
-    grow:   { w: 22, h: 14 },
-    fall:   { w: 23, h: 23 },
-    splash: { w: 32, h: 20 },
-};
-
 // フェーズ継続時間（ms）
-const PHASE_MS = { grow: 320 };
+const PHASE_MS = { grow: 400 };
 // 着水フェード時間（ms）
-const SPLASH_MS = 180;
+const SPLASH_MS = 200;
 
 function initCanvas() {
     canvasW = chamberImg.offsetWidth;
@@ -287,9 +273,10 @@ function spawnDrop() {
     drops.push({
         phase: 'grow',
         x: tipX,
-        y: tipY + DROP_SIZE.grow.h,
+        y: tipY,
         vy: 0,
-        elapsed: 0,   // フェーズ内の経過ms
+        elapsed: 0,
+        trail: [],
     });
 }
 
@@ -305,24 +292,20 @@ function updateDrops(dt) {
             if (d.elapsed >= PHASE_MS.grow) {
                 d.phase   = 'fall';
                 d.elapsed = 0;
-                d.vy      = 4.5;
-                d.trail   = [];
+                d.vy      = 3.5;
             }
 
         } else if (d.phase === 'fall') {
-            d.vy += 0.52 * dtFactor;
+            d.vy += 0.48 * dtFactor;
             d.y  += d.vy * dtFactor;
-            if (!d.trail) d.trail = [];
-            d.trail.push({ x: d.x, y: d.y, alpha: 0.45 });
-            if (d.trail.length > 6) d.trail.shift();
-            const splashThreshold = surfaceY - DROP_SIZE.splash.h * 0.3;
-            if (d.y >= splashThreshold) {
+            d.trail.push({ x: d.x, y: d.y });
+            if (d.trail.length > 7) d.trail.shift();
+            if (d.y >= surfaceY - 2) {
                 d.phase   = 'splash';
                 d.y       = surfaceY;
                 d.elapsed = 0;
-                ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 42, alpha: 0.8 });
+                ripples.push({ x: d.x, y: surfaceY, r: 2, maxR: 42, alpha: 0.8 });
                 surfaceWaves.push({ x: d.x, amp: 6.0, elapsed: 0 });
-                // 着水タイミングで音を鳴らす
                 if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
             }
 
@@ -392,54 +375,76 @@ function drawSurface() {
     ctx.restore();
 }
 
+function drawTeardrop(x, y, rx, ry) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - ry);
+    ctx.bezierCurveTo(x + rx * 1.1, y - ry * 0.3, x + rx, y + ry * 0.5, x, y + ry);
+    ctx.bezierCurveTo(x - rx, y + ry * 0.5, x - rx * 1.1, y - ry * 0.3, x, y - ry);
+    ctx.closePath();
+}
+
 function drawDrops() {
     drops.forEach(d => {
         if (d.phase === 'grow') {
-            // tekika1: 成長アニメーション（イージングで滑らかに拡大）
             const t = Math.min(d.elapsed / PHASE_MS.grow, 1);
-            const progress = t * t * (3 - 2 * t); // smoothstep
-            const sw = DROP_SIZE.grow.w * progress;
-            const sh = DROP_SIZE.grow.h * progress;
-            const img = dropImgs[0];
-            if (img && img.complete && sw > 0) {
-                ctx.drawImage(img, tipX - sw / 2 - 1, tipY, sw, sh);
-            }
+            const ease = t * t * (3 - 2 * t);
+            const rx = 4 * ease;
+            const ry = 6 * ease;
+            if (rx < 0.5) return;
+            const grad = ctx.createRadialGradient(d.x - rx * 0.3, d.y - ry * 0.3, 0, d.x, d.y, ry * 1.2);
+            grad.addColorStop(0, 'rgba(220,240,255,0.95)');
+            grad.addColorStop(0.6, 'rgba(160,210,240,0.75)');
+            grad.addColorStop(1, 'rgba(100,170,220,0.5)');
+            ctx.save();
+            drawTeardrop(d.x, d.y + ry, rx, ry);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(80,150,200,0.4)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.restore();
 
         } else if (d.phase === 'fall') {
             // 残像
-            if (d.trail) {
-                const img = dropImgs[2];
-                if (img && img.complete) {
-                    d.trail.forEach((pt, i) => {
-                        const a = (i / d.trail.length) * 0.3;
-                        ctx.save();
-                        ctx.globalAlpha = a;
-                        ctx.drawImage(img, pt.x - DROP_SIZE.fall.w / 2, pt.y - DROP_SIZE.fall.h / 2, DROP_SIZE.fall.w, DROP_SIZE.fall.h);
-                        ctx.restore();
-                    });
-                }
-            }
-            // tekika3: 落下中・速度に応じて縦方向に伸びる
-            const stretch = Math.min(1 + d.vy * 0.030, 1.4);
-            const sw = DROP_SIZE.fall.w;
-            const sh = DROP_SIZE.fall.h * stretch;
-            const img = dropImgs[2];
-            if (img && img.complete) {
-                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-            }
+            d.trail.forEach((pt, i) => {
+                const a = (i / d.trail.length) * 0.18;
+                ctx.save();
+                ctx.globalAlpha = a;
+                drawTeardrop(pt.x, pt.y, 4, 6);
+                ctx.fillStyle = 'rgba(160,210,240,0.6)';
+                ctx.fill();
+                ctx.restore();
+            });
+            // 落下中：速度で縦に伸びる雫形
+            const stretch = Math.min(1 + d.vy * 0.025, 1.5);
+            const rx = 4;
+            const ry = 6 * stretch;
+            const grad = ctx.createRadialGradient(d.x - rx * 0.3, d.y - ry * 0.3, 0, d.x, d.y, ry * 1.2);
+            grad.addColorStop(0, 'rgba(230,245,255,0.95)');
+            grad.addColorStop(0.5, 'rgba(160,215,245,0.8)');
+            grad.addColorStop(1, 'rgba(100,170,220,0.5)');
+            ctx.save();
+            drawTeardrop(d.x, d.y, rx, ry);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(80,150,200,0.35)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.restore();
 
         } else if (d.phase === 'splash') {
-            // tekika4: 着水・フェードアウト
-            const alpha = 1 - d.elapsed / SPLASH_MS;
-            const sw = DROP_SIZE.splash.w;
-            const sh = DROP_SIZE.splash.h;
-            const img = dropImgs[3];
-            if (img && img.complete) {
-                ctx.save();
-                ctx.globalAlpha = Math.max(alpha, 0);
-                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-                ctx.restore();
-            }
+            // 着水：横に広がってフェード
+            const progress = d.elapsed / SPLASH_MS;
+            const alpha = 1 - progress;
+            const rx = 5 + progress * 8;
+            const ry = 3 * (1 - progress * 0.6);
+            ctx.save();
+            ctx.globalAlpha = Math.max(alpha * 0.7, 0);
+            ctx.beginPath();
+            ctx.ellipse(d.x, d.y, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(180,220,245,0.6)';
+            ctx.fill();
+            ctx.restore();
         }
     });
 }
