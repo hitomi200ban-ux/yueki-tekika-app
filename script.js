@@ -246,12 +246,14 @@ const TIP_RATIO = { x: 0.50, y: 0.295 };
 let liquidLevel = 0.62;
 
 let tipX = 0, tipY = 0, canvasW = 0, canvasH = 0;
-let animFrameId    = null;
-let dropIntervalId = null;
-let lastTime       = null;
-let drops          = [];
-let ripples        = [];
-let surfaceWaves   = [];
+let animFrameId      = null;
+let dropIntervalId   = null;
+let lastTime         = null;
+let drops            = [];
+let ripples          = [];
+let surfaceWaves     = [];
+let dropSpawnTimer   = 0;
+let dropSpawnInterval = 1.0;
 
 // 各フェーズの画像サイズ（canvas px）
 const DROP_SIZE = {
@@ -261,9 +263,9 @@ const DROP_SIZE = {
 };
 
 // フェーズ継続時間（ms）
-const PHASE_MS = { grow: 480 };
+const PHASE_MS = { grow: 320 };
 // 着水フェード時間（ms）
-const SPLASH_MS = 220;
+const SPLASH_MS = 180;
 
 function initCanvas() {
     canvasW = chamberImg.offsetWidth;
@@ -303,19 +305,23 @@ function updateDrops(dt) {
             if (d.elapsed >= PHASE_MS.grow) {
                 d.phase   = 'fall';
                 d.elapsed = 0;
-                d.vy      = 1.8;
+                d.vy      = 4.5;
+                d.trail   = [];
             }
 
         } else if (d.phase === 'fall') {
-            d.vy += 0.32 * dtFactor;
+            d.vy += 0.52 * dtFactor;
             d.y  += d.vy * dtFactor;
+            if (!d.trail) d.trail = [];
+            d.trail.push({ x: d.x, y: d.y, alpha: 0.45 });
+            if (d.trail.length > 6) d.trail.shift();
             const splashThreshold = surfaceY - DROP_SIZE.splash.h * 0.3;
             if (d.y >= splashThreshold) {
                 d.phase   = 'splash';
                 d.y       = surfaceY;
                 d.elapsed = 0;
-                ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 28, alpha: 0.65 });
-                surfaceWaves.push({ x: d.x, amp: 3.5, elapsed: 0 });
+                ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 42, alpha: 0.8 });
+                surfaceWaves.push({ x: d.x, amp: 6.0, elapsed: 0 });
                 // 着水タイミングで音を鳴らす
                 if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
             }
@@ -389,8 +395,9 @@ function drawSurface() {
 function drawDrops() {
     drops.forEach(d => {
         if (d.phase === 'grow') {
-            // tekika1: 成長アニメーション（徐々に拡大）
-            const progress = Math.min(d.elapsed / PHASE_MS.grow, 1);
+            // tekika1: 成長アニメーション（イージングで滑らかに拡大）
+            const t = Math.min(d.elapsed / PHASE_MS.grow, 1);
+            const progress = t * t * (3 - 2 * t); // smoothstep
             const sw = DROP_SIZE.grow.w * progress;
             const sh = DROP_SIZE.grow.h * progress;
             const img = dropImgs[0];
@@ -399,8 +406,21 @@ function drawDrops() {
             }
 
         } else if (d.phase === 'fall') {
-            // tekika3: 落下中・速度に応じて縦方向にわずかに伸びる
-            const stretch = Math.min(1 + d.vy * 0.022, 1.25);
+            // 残像
+            if (d.trail) {
+                const img = dropImgs[2];
+                if (img && img.complete) {
+                    d.trail.forEach((pt, i) => {
+                        const a = (i / d.trail.length) * 0.3;
+                        ctx.save();
+                        ctx.globalAlpha = a;
+                        ctx.drawImage(img, pt.x - DROP_SIZE.fall.w / 2, pt.y - DROP_SIZE.fall.h / 2, DROP_SIZE.fall.w, DROP_SIZE.fall.h);
+                        ctx.restore();
+                    });
+                }
+            }
+            // tekika3: 落下中・速度に応じて縦方向に伸びる
+            const stretch = Math.min(1 + d.vy * 0.030, 1.4);
             const sw = DROP_SIZE.fall.w;
             const sh = DROP_SIZE.fall.h * stretch;
             const img = dropImgs[2];
@@ -426,8 +446,14 @@ function drawDrops() {
 
 function renderFrame(timestamp) {
     if (!lastTime) lastTime = timestamp;
-    const dt = Math.min(timestamp - lastTime, 50); // 最大50ms（タブ非表示復帰対策）
+    const dt = Math.min(timestamp - lastTime, 50);
     lastTime = timestamp;
+
+    dropSpawnTimer += dt / 1000;
+    if (dropSpawnTimer >= dropSpawnInterval) {
+        dropSpawnTimer -= dropSpawnInterval;
+        spawnDrop();
+    }
 
     ctx.clearRect(0, 0, canvasW, canvasH);
     updateDrops(dt);
@@ -443,9 +469,9 @@ function startDropAnimation(intervalSec) {
         initCanvas();
         drops = []; ripples = []; surfaceWaves = [];
         lastTime = null;
-        renderFrame(performance.now());
-        spawnDrop();
-        dropIntervalId = setInterval(spawnDrop, intervalSec * 1000);
+        dropSpawnTimer = intervalSec; // 即座に1滴目を出す
+        dropSpawnInterval = intervalSec;
+        animFrameId = requestAnimationFrame(renderFrame);
     };
     if (chamberImg.complete && chamberImg.naturalWidth > 0) {
         doStart();
@@ -455,9 +481,9 @@ function startDropAnimation(intervalSec) {
 }
 
 function stopDropAnimation() {
-    if (animFrameId)    { cancelAnimationFrame(animFrameId); animFrameId = null; }
-    if (dropIntervalId) { clearInterval(dropIntervalId); dropIntervalId = null; }
+    if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
     drops = []; ripples = []; surfaceWaves = [];
     lastTime = null;
+    dropSpawnTimer = 0;
     if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
 }
