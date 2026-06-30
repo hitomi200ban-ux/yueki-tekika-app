@@ -437,9 +437,8 @@ h1 {
 
 /* 音ON/OFFボタン */
 .sound-toggle-wrap {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
+    /* animation-container 内で position:absolute で右上に配置するため非表示化 */
+    display: none;
 }
 
 .sound-btn {
@@ -456,6 +455,7 @@ h1 {
     cursor: pointer;
     transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
 }
 
 .sound-btn[data-on="true"] {
@@ -468,26 +468,63 @@ h1 {
     font-size: 16px;
 }
 
-/* アニメーションコンテナ */
+/* アニメーションコンテナ：相対配置の基点 */
 .animation-container {
+    position: relative;
     background: linear-gradient(180deg, #f5f9fc 0%, #e8f4f8 100%);
     border-radius: 16px;
-    padding: 16px;
+    padding: 12px;
     margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 利用可能な縦スペースを flex で使い切る */
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* 音OFFボタン：コンテナ右上に絶対配置 */
+.animation-container .sound-btn-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1.5px solid #b3e5fc;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.92);
+    color: #90a4ae;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+}
+
+.animation-container .sound-btn-overlay[data-on="true"] {
+    border-color: #4fc3f7;
+    background: rgba(225,245,254,0.95);
+    color: #0288d1;
+}
+
+.chamber-wrap {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.chamber-wrap {
-    position: relative;
-    display: inline-block;
-}
-
 .chamber-img {
     display: block;
-    width: 200px;
+    /* 固定px廃止 → コンテナ幅・高さに応じて縮小 */
+    width: min(200px, 55vw);
+    max-height: 55vh;
     height: auto;
+    object-fit: contain;
 }
 
 #dropCanvas {
@@ -495,6 +532,23 @@ h1 {
     top: 0;
     left: 0;
     pointer-events: none;
+}
+
+/* 結果画面全体を縦 flex にして高さを分配 */
+#resultScreen {
+    display: none;
+    flex-direction: column;
+    padding: 40px 30px;
+}
+
+#resultScreen.active {
+    display: flex;
+    animation: fadeIn 0.5s ease;
+}
+
+/* result-box は縮まない */
+.result-box {
+    flex-shrink: 0;
 }
 
 /* 戻るボタン */
@@ -519,11 +573,17 @@ h1 {
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
     .screen {
-        padding: 30px 20px;
+        padding: 24px 16px;
     }
 
     h1 {
-        font-size: 24px;
+        font-size: 22px;
+        margin-bottom: 16px;
+    }
+
+    .result-box {
+        padding: 16px;
+        margin-bottom: 16px;
     }
 
     .result-value {
@@ -531,19 +591,38 @@ h1 {
     }
 
     .animation-container {
-        min-height: 450px;
-        padding: 20px 10px;
+        padding: 10px;
+        margin-bottom: 16px;
     }
 
-    .drop-zone {
-        height: 400px;
+    .chamber-img {
+        width: min(180px, 52vw);
+        max-height: 48vh;
     }
 
-    .iv-chamber-img {
-        max-width: 150px;
+    .back-btn {
+        flex-shrink: 0;
+    }
+}
+
+/* 極小端末（画面高さ 640px 以下）向け追加調整 */
+@media (max-height: 640px) {
+    h1 {
+        font-size: 20px;
+        margin-bottom: 10px;
     }
 
-    #dropArea {
-        height: 350px;
+    .result-box {
+        padding: 10px 16px;
+        margin-bottom: 10px;
+    }
+
+    .chamber-img {
+        width: min(150px, 45vw);
+        max-height: 40vh;
+    }
+
+    #resultScreen.active {
+        padding: 20px 16px;
     }
 }
