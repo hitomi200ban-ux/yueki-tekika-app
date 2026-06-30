@@ -754,13 +754,14 @@ h1 {
     display: flex !important;
 }
 
-/* 結果カード：余った縦スペースをすべて使う */
+/* 結果カード：チャンバー中央・数値を四隅に絶対配置 */
 .result-card {
     background: #f8f8f8;
     border-radius: 20px;
-    padding: 16px 0;
+    padding: 16px 8px;
     display: flex;
     justify-content: center;
+    align-items: center;
     box-shadow: none;
     width: 100%;
     max-width: 420px;
@@ -768,80 +769,46 @@ h1 {
     position: relative;
     box-sizing: border-box;
     flex: 1 1 auto;
+    min-height: 280px;
 }
 
-/* 3カラムレイアウト */
-.result-3col {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 0;
-    /* はみ出し防止 */
-    overflow: hidden;
-    min-width: 0;
-}
-
-/* 左：滴下速度 */
-.result-left {
-    flex: 0 0 80px;
-    min-width: 0;
+/* 左：滴下速度（中央より上） */
+.rn-topleft {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-160%);
+    left: 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    gap: 48px;
+    align-items: flex-start;
 }
 
-.result-left-top,
-.result-left-bottom {
+/* 左：合わせ方（中央より下） */
+.rn-bottomleft {
+    position: absolute;
+    top: 50%;
+    transform: translateY(60%);
+    left: 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
 }
 
 /* 中央：アニメーション（主役） */
 .result-center {
-    flex: 1 1 auto;
-    min-width: 0;
-    /* 高さをresult-cardから継承して画像を縦に広げる */
-    align-self: stretch;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-/* 右：ボタン */
-.result-right {
-    flex: 0 0 72px;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 0;
-}
-
-.result-guide-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.result-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
 .rn-label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     color: #000000;
     line-height: 1;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
 .rn-rate-wrap {
@@ -850,7 +817,7 @@ h1 {
 }
 
 .rn-rate {
-    font-size: clamp(28px, 9vw, 52px);
+    font-size: clamp(64px, 20vw, 100px);
     font-weight: bold;
     color: #0277bd;
     line-height: 1;
@@ -858,10 +825,10 @@ h1 {
 }
 
 .rn-unit {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #0288d1;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .rn-exact {
@@ -874,7 +841,7 @@ h1 {
 }
 
 .rn-sec {
-    font-size: clamp(28px, 9vw, 52px);
+    font-size: clamp(64px, 20vw, 100px);
     font-weight: bold;
     color: #f57f17;
     line-height: 1;
@@ -882,10 +849,10 @@ h1 {
 }
 
 .rn-sec-unit {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
     color: #f57f17;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .sound-btn-v {
@@ -1032,5 +999,17 @@ h1 {
 
     #dropArea {
         height: 350px;
+    }
+}
+
+/* 小型端末（360px幅・720px高さ以下）：チャンバーと重ならない最大サイズ */
+@media (max-width: 360px), (max-height: 720px) {
+    .rn-rate,
+    .rn-sec {
+        font-size: clamp(48px, 14vw, 64px);
+    }
+    .rn-unit,
+    .rn-sec-unit {
+        font-size: 16px;
     }
 }
