@@ -726,3 +726,43 @@ function stopChildDropAnimation() {
     cLastTime = null;
     if (cCanvasW > 0) ctxC.clearRect(0, 0, cCanvasW, cCanvasH);
 }
+
+// ============================================================
+// AdMob バナー広告（入力画面下部のみ・結果画面には表示しない）
+// ============================================================
+// 本番バナーユニットID
+const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
+
+(async function initAdMob() {
+    if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) {
+        return; // ブラウザプレビュー等では何もしない
+    }
+    const AdMob = window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
+    if (!AdMob) {
+        console.warn('AdMob plugin not found on window.Capacitor.Plugins');
+        return;
+    }
+
+    // BannerAdPosition / BannerAdSize は enum なので文字列値を直接使用
+    const bannerOptions = {
+        adId: ADMOB_BANNER_ID,
+        adSize: 'ADAPTIVE_BANNER',
+        position: 'BOTTOM_CENTER',
+        margin: 0,
+    };
+
+    try {
+        await AdMob.initialize({});
+        await AdMob.showBanner(bannerOptions);
+
+        // 結果画面ではバナーを隠し、入力画面に戻ったら再表示する
+        calculateBtn.addEventListener('click', () => {
+            AdMob.hideBanner().catch(() => {});
+        });
+        backBtn.addEventListener('click', () => {
+            AdMob.showBanner(bannerOptions).catch(() => {});
+        });
+    } catch (e) {
+        console.warn('AdMob init failed:', e);
+    }
+})();

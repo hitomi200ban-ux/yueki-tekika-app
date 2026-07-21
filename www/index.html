@@ -101,6 +101,8 @@
             </div>
 
             <button id="calculateBtn" class="calculate-btn">計算する</button>
+
+            <div id="bannerAdSpace" class="banner-ad-space"></div>
         </div>
 
         <!-- 結果画面 -->
@@ -109,55 +111,48 @@
             <div class="result-title">輸液滴下計算</div>
             <div class="result-subtitle">看護師・看護学生向け点滴滴下計算アプリ</div>
 
-            <!-- 3カラム：左数値・中央アニメ・右ボタン＋合わせ方 -->
+            <!-- チャンバー中央・数値を四隅に配置 -->
             <div class="result-card">
+                <!-- 左上：滴下速度 -->
+                <div class="rn-topleft">
+                    <div class="rn-label">滴下速度</div>
+                    <div class="rn-rate-wrap">
+                        <span class="rn-rate" id="dropRate">--</span>
+                    </div>
+                    <div class="rn-unit">滴/分</div>
+                    <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
+                </div>
+
                 <!-- 右上：音ボタン -->
                 <button id="soundBtn" class="sound-btn-v sound-btn-corner" data-on="false">
                     <span class="sound-icon">🔇</span>
                     <span class="sound-label-v">音OFF</span>
                 </button>
 
-                <div class="result-3col">
-
-                    <!-- 左：滴下速度（上）＋合わせ方（下） -->
-                    <div class="result-left">
-                        <div class="result-left-top">
-                            <div class="rn-label">滴下速度</div>
-                            <div class="rn-rate-wrap">
-                                <span class="rn-rate" id="dropRate">--</span>
-                            </div>
-                            <div class="rn-unit">滴/分</div>
-                            <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
-                        </div>
-                        <div class="result-left-bottom">
-                            <div class="rn-label">合わせ方</div>
-                            <div class="rn-sec-wrap">
-                                <span class="rn-sec" id="dropIntervalSec">--</span>
-                            </div>
-                            <div class="rn-sec-unit">秒に1滴</div>
-                        </div>
+                <!-- 中央：アニメーション -->
+                <div class="result-center">
+                    <div class="chamber-wrap" id="chamberAdult">
+                        <img src="./img/seizinyou_tekika.PNG" id="chamberImg" class="chamber-img">
+                        <canvas id="dropCanvas"></canvas>
                     </div>
-
-                    <!-- 中央：アニメーション -->
-                    <div class="result-center">
-                        <div class="chamber-wrap" id="chamberAdult">
-                            <img src="./img/seizinyou_tekika.PNG" id="chamberImg" class="chamber-img">
-                            <canvas id="dropCanvas"></canvas>
-                        </div>
-                        <div class="chamber-wrap" id="chamberChild" style="display:none;">
-                            <img src="./img/sixyouni_tekika.PNG" id="chamberImgChild" class="chamber-img">
-                            <canvas id="dropCanvasChild"></canvas>
-                        </div>
+                    <div class="chamber-wrap" id="chamberChild" style="display:none;">
+                        <img src="./img/sixyouni_tekika.PNG" id="chamberImgChild" class="chamber-img">
+                        <canvas id="dropCanvasChild"></canvas>
                     </div>
+                </div>
 
-                    <!-- 右：計算式ボタン -->
-                    <div class="result-right">
-                        <div class="result-btns">
-                            <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
-                                <span>計算式</span>
-                            </button>
-                        </div>
+                <!-- 右下：計算式ボタン -->
+                <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
+                    <span>計算式</span>
+                </button>
+
+                <!-- 左下：合わせ方 -->
+                <div class="rn-bottomleft">
+                    <div class="rn-label">合わせ方</div>
+                    <div class="rn-sec-wrap">
+                        <span class="rn-sec" id="dropIntervalSec">--</span>
                     </div>
+                    <div class="rn-sec-unit">秒に1滴</div>
                 </div>
             </div>
 
