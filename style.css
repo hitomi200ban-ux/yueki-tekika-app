@@ -469,6 +469,17 @@ h1 {
     margin-top: 16px;
 }
 
+.privacy-link {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    padding-bottom: 8px;
+    font-size: 11px;
+    color: #b0bec5;
+    text-decoration: underline;
+    -webkit-tap-highlight-color: transparent;
+}
+
 /* 結果表示 */
 .result-section-label {
     font-size: 11px;
