@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "45002954601",
-    "project_id": "taion-app-edea3",
-    "storage_bucket": "taion-app-edea3.firebasestorage.app"
+    "project_number": "1071025037909",
+    "project_id": "yueki-tekika-app",
+    "storage_bucket": "yueki-tekika-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:45002954601:android:0a5d2c879a0033778acff8",
-        "android_client_info": {
-          "package_name": "com.buchalab.btchart"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBXS55ar9s93MzCqzbz6OV8qF3zHBrtQ_A"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:45002954601:android:15a93ddcbd0be2c48acff8",
+        "mobilesdk_app_id": "1:1071025037909:android:68ec92aae8731a34636adc",
         "android_client_info": {
           "package_name": "com.yueki.tekika"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBXS55ar9s93MzCqzbz6OV8qF3zHBrtQ_A"
+          "current_key": "AIzaSyCrDuZ7XnyUSkTHpPfmNbdGDT2mW04JtSU"
         }
       ],
       "services": {
