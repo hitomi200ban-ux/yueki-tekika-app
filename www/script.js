@@ -760,7 +760,7 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
             AdMob.hideBanner().catch(() => {});
         });
         backBtn.addEventListener('click', () => {
-            AdMob.showBanner(bannerOptions).catch(() => {});
+            AdMob.resumeBanner().catch(() => {});
         });
     } catch (e) {
         console.warn('AdMob init failed:', e);
