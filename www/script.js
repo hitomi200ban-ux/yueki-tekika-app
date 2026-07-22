@@ -19,7 +19,6 @@ const calculateBtn        = document.getElementById('calculateBtn');
 const backBtn             = document.getElementById('backBtn');
 const dropRateDisplay     = document.getElementById('dropRate');
 const dropIntervalDisplay = document.getElementById('dropInterval');
-const dropArea            = document.getElementById('dropArea');
 const swiperTrack         = document.getElementById('swiperTrack');
 const selectedVolumeText  = document.getElementById('selectedVolumeText');
 
@@ -115,12 +114,22 @@ document.getElementById('nextBtn').addEventListener('click', () => {
     if (currentIndex < volumes.length - 1) updateSwiper(currentIndex + 1);
 });
 
+const manualVolumeInput = document.getElementById('manualVolume');
+
 document.getElementById('manualConfirmBtn').addEventListener('click', () => {
-    const val = parseFloat(document.getElementById('manualVolume').value);
+    const val = parseFloat(manualVolumeInput.value);
     if (!val || val <= 0) { alert('正しい数値を入力してください。'); return; }
     manualVolume = val;
     confirmSelection(5);
     document.getElementById('manualConfirmBtn').classList.add('decided');
+});
+
+manualVolumeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        manualVolumeInput.blur();
+        const Keyboard = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard;
+        if (Keyboard) Keyboard.hide().catch(() => {});
+    }
 });
 
 updateSwiper(1);
