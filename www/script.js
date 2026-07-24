@@ -760,16 +760,60 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
         margin: 0,
     };
 
+    const bannerAdSpace = document.getElementById('bannerAdSpace');
+    let bannerVisible = false;
+    let onResultScreen = false;
+    let bannerHeightPx = 60; // 実測前の概算値（bannerAdSizeChangedで上書きされる）
+
+    // 入力画面を一番下までスクロールしたときだけ広告を表示する。
+    // 広告はビューポート最下部に重なって表示されるため、広告の高さ分を
+    // 差し引いた位置を「一番下」とみなし、プライバシーポリシーと重ならないようにする。
+    function updateBannerVisibility() {
+        if (onResultScreen) return;
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - bannerHeightPx - 1;
+        if (atBottom && !bannerVisible) {
+            bannerVisible = true;
+            AdMob.resumeBanner().catch(() => {});
+        } else if (!atBottom && bannerVisible) {
+            bannerVisible = false;
+            AdMob.hideBanner().catch(() => {});
+        }
+    }
+
     try {
         await AdMob.initialize({});
-        await AdMob.showBanner(bannerOptions);
 
-        // 結果画面ではバナーを隠し、入力画面に戻ったら再表示する
+        // 広告の表示/非表示に連動して #bannerAdSpace の高さを切り替える。
+        // 非表示中は高さ0にして、プライバシーポリシーの下の余白を最小限にする。
+        // 古い端末ではdp→px換算の誤差で実サイズより広めの余白になることがあるため、
+        // 見た目上の余白（#bannerAdSpaceの高さ）には安全マージン係数をかけて詰める。
+        const BANNER_SPACE_SAFETY_RATIO = 0.5;
+        AdMob.addListener('bannerAdSizeChanged', (info) => {
+            if (!bannerAdSpace || !info) return;
+            if (info.height > 0) {
+                bannerHeightPx = info.height;
+                bannerAdSpace.style.height = Math.round(info.height * BANNER_SPACE_SAFETY_RATIO) + 'px';
+            } else {
+                bannerAdSpace.style.height = '0';
+            }
+            updateBannerVisibility();
+        });
+
+        await AdMob.showBanner(bannerOptions);
+        await AdMob.hideBanner().catch(() => {});
+
+        window.addEventListener('scroll', updateBannerVisibility, { passive: true });
+        updateBannerVisibility();
+
+        // 結果画面ではバナーを隠し、入力画面に戻ったらスクロール位置に応じて再表示する
         calculateBtn.addEventListener('click', () => {
+            onResultScreen = true;
+            bannerVisible = false;
             AdMob.hideBanner().catch(() => {});
         });
         backBtn.addEventListener('click', () => {
-            AdMob.resumeBanner().catch(() => {});
+            onResultScreen = false;
+            updateBannerVisibility();
         });
     } catch (e) {
         console.warn('AdMob init failed:', e);
