@@ -116,16 +116,19 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 
 const manualVolumeInput = document.getElementById('manualVolume');
 
-document.getElementById('manualConfirmBtn').addEventListener('click', () => {
+function confirmManualVolume() {
     const val = parseFloat(manualVolumeInput.value);
     if (!val || val <= 0) { alert('正しい数値を入力してください。'); return; }
     manualVolume = val;
     confirmSelection(5);
     document.getElementById('manualConfirmBtn').classList.add('decided');
-});
+}
+
+document.getElementById('manualConfirmBtn').addEventListener('click', confirmManualVolume);
 
 manualVolumeInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
+        confirmManualVolume();
         manualVolumeInput.blur();
         const Keyboard = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Keyboard;
         if (Keyboard) Keyboard.hide().catch(() => {});
