@@ -2,10 +2,30 @@
 // 地域・言語
 // 地域（臨床ルール）は regions/、文言は i18n/、チャンバー画像は chambers.js に置く
 // ============================================================
-// 現在は日本版のみ。US版追加時に端末の言語・ユーザーの選択から決めるようにする
-const ACTIVE_REGION_ID = 'JP';
-const region  = REGIONS[ACTIVE_REGION_ID];
+// どの地域の言語にも当てはまらないときの地域
+const DEFAULT_REGION_ID = 'US';
+// ユーザーが地域を選んだときの保存先
+const REGION_STORAGE_KEY = 'regionId';
+
+// 地域を決める：保存された選択 → 端末の言語 → 既定の地域
+function resolveRegionId() {
+    try {
+        const saved = localStorage.getItem(REGION_STORAGE_KEY);
+        if (saved && REGIONS[saved]) return saved;
+    } catch (e) { /* 保存領域が使えない環境では端末の言語で決める */ }
+    const lang = (navigator.language || '').toLowerCase();
+    const match = Object.keys(REGIONS).find(id =>
+        (REGIONS[id].languages || []).some(prefix => lang.startsWith(prefix)));
+    return match || DEFAULT_REGION_ID;
+}
+
+const region  = REGIONS[resolveRegionId()];
 const strings = STRINGS[region.locale];
+
+// 地域によって存在しない文言（ヒントや注意書き）があるかどうか
+function hasString(key) {
+    return strings[key] !== undefined;
+}
 
 // 文言を取得する（{name} を vars の値で置換）
 function t(key, vars) {
@@ -28,6 +48,12 @@ function applyStrings() {
     // CSS の ::after（「✓ 決定」バッジ）用
     document.documentElement.style.setProperty('--decided-label', JSON.stringify(t('common.decided')));
     document.getElementById('privacyLink').href = region.privacyUrl;
+    // 免責表示は地域プロファイルで指定されたときだけ出す
+    if (region.disclaimerKey) {
+        const disclaimer = document.getElementById('disclaimer');
+        disclaimer.textContent = t(region.disclaimerKey);
+        disclaimer.hidden = false;
+    }
 }
 
 applyStrings();
@@ -101,10 +127,24 @@ function renderVolumePresets() {
         const item = document.createElement('div');
         item.className = 'swiper-item';
         item.dataset.volume = v.ml;
-        const img = document.createElement('img');
-        img.src = v.image;
-        img.alt = v.ml + 'ml';
-        item.appendChild(img);
+        if (v.image) {
+            const img = document.createElement('img');
+            img.src = v.image;
+            img.alt = v.ml + 'ml';
+            item.appendChild(img);
+        } else {
+            // 画像が用意されるまでは容量を大きく表示したカードで代用する
+            const card = document.createElement('div');
+            card.className = 'volume-placeholder';
+            const num = document.createElement('span');
+            num.className = 'volume-placeholder-num';
+            num.textContent = v.ml;
+            const unit = document.createElement('span');
+            unit.className = 'volume-placeholder-unit';
+            unit.textContent = 'mL';
+            card.append(num, unit);
+            item.appendChild(card);
+        }
         swiperTrack.insertBefore(item, manualItem);
     });
 }
@@ -219,15 +259,61 @@ document.getElementById('minuteDown').addEventListener('click', () => {
 // ============================================================
 // ルート種類選択（地域プロファイルの tubing から生成）
 // ============================================================
+// 滴下係数を複数から選ぶルート（US の Macrodrip など）用の選択欄。該当ルートがない地域では作らない
+let factorGroup = null;
+
 function selectTubing(tubing, btn) {
+    const changed = tubing !== selectedTubing;
     selectedTubing = tubing;
-    // 滴下係数が1つだけのルートは、ボタン選択で係数も確定する
-    selectedFactor = tubing.factors.length === 1 ? tubing.factors[0] : null;
+    // 滴下係数が1つだけのルートは、ボタン選択で係数も確定する。
+    // 複数あるルートは係数ボタンで選ぶまで未確定（同じルートを押し直したときは選択を保つ）
+    if (tubing.factors.length === 1) {
+        selectedFactor = tubing.factors[0];
+    } else if (changed) {
+        selectedFactor = null;
+    }
     tubingGroup.querySelectorAll('.type-btn').forEach(el => el.classList.toggle('active', el === btn));
+    if (factorGroup) renderFactorOptions();
     updateSummary();
 }
 
+function selectFactor(factor) {
+    selectedFactor = factor;
+    renderFactorOptions();
+    updateSummary();
+}
+
+// 選択中のルートの滴下係数ボタンを表示する（係数が1つだけのルートでは隠す）
+function renderFactorOptions() {
+    const options = factorGroup.querySelector('.factor-options');
+    options.textContent = '';
+    if (!selectedTubing || selectedTubing.factors.length === 1) {
+        factorGroup.hidden = true;
+        return;
+    }
+    selectedTubing.factors.forEach(factor => {
+        const btn = document.createElement('button');
+        btn.className = 'factor-btn' + (factor === selectedFactor ? ' active' : '');
+        btn.textContent = factor;
+        btn.addEventListener('click', () => selectFactor(factor));
+        options.appendChild(btn);
+    });
+    factorGroup.hidden = false;
+}
+
 function renderTubingButtons() {
+    // 見出しの横のヒント（例：Select drip factor）
+    if (hasString('tubing.hint')) {
+        const label = tubingGroup.parentElement.querySelector('label');
+        const row = document.createElement('div');
+        row.className = 'label-hint-row';
+        const hint = document.createElement('p');
+        hint.className = 'swipe-hint';
+        hint.textContent = t('tubing.hint');
+        label.replaceWith(row);
+        row.append(label, hint);
+    }
+
     region.tubing.forEach(tubing => {
         const btn = document.createElement('button');
         btn.className = 'type-btn';
@@ -238,9 +324,39 @@ function renderTubingButtons() {
         const label = document.createElement('span');
         label.textContent = t(tubing.labelKey);
         btn.append(img, label);
+        if (tubing.subLabelKey) {
+            const sub = document.createElement('span');
+            sub.className = 'type-sub';
+            sub.textContent = t(tubing.subLabelKey);
+            btn.appendChild(sub);
+        }
         btn.addEventListener('click', () => selectTubing(tubing, btn));
         tubingGroup.appendChild(btn);
     });
+
+    if (region.tubing.some(tubing => tubing.factors.length > 1)) {
+        factorGroup = document.createElement('div');
+        factorGroup.className = 'factor-group';
+        factorGroup.hidden = true;
+        const label = document.createElement('span');
+        label.className = 'factor-label';
+        label.textContent = t('tubing.factorLabel');
+        const options = document.createElement('div');
+        options.className = 'factor-options';
+        const unit = document.createElement('span');
+        unit.className = 'factor-unit';
+        unit.textContent = t('tubing.factorUnit');
+        factorGroup.append(label, options, unit);
+        tubingGroup.after(factorGroup);
+    }
+
+    // ルート選択欄の下の注意書き（例：滴下係数はチューブの包装で確認）
+    if (hasString('tubing.note')) {
+        const note = document.createElement('p');
+        note.className = 'tubing-note';
+        note.textContent = t('tubing.note');
+        (factorGroup || tubingGroup).after(note);
+    }
 }
 
 renderTubingButtons();
@@ -255,7 +371,8 @@ calculateBtn.addEventListener('click', () => {
     const m = parseInt(minuteSelect.value);
     const hours = h + m / 60;
     if (!volume || volume <= 0) { alert(t('alert.volumeEmpty')); return; }
-    if (!selectedFactor) { alert(t('alert.tubing')); return; }
+    if (!selectedTubing) { alert(t('alert.tubing')); return; }
+    if (!selectedFactor) { alert(t('alert.dropFactor')); return; }
     if (hours <= 0) { alert(t('alert.time')); return; }
 
     const dropFactor = selectedFactor;
@@ -462,8 +579,8 @@ function createDropAnimator(cfg, chamberImg, canvas) {
                     d.elapsed = 0;
                     ripples.push({ x: d.x, y: surfaceY, r: cfg.ripple.r, maxR: cfg.ripple.maxR, alpha: cfg.ripple.alpha });
                     surfaceWaves.push({ x: d.x, amp: cfg.wave.amp, elapsed: 0 });
-                    // 着水タイミングで音を鳴らす
-                    if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
+                    // 着水タイミングで音を鳴らす（見た目と合わせるため、チャンバーごとに遅らせられる）
+                    if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime + (cfg.soundDelayMs || 0) / 1000);
                 }
 
             } else if (d.phase === 'splash') {

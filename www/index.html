@@ -90,6 +90,9 @@
 
             <button id="calculateBtn" class="calculate-btn" data-i18n="calculate">計算する</button>
 
+            <!-- 免責表示（地域プロファイルに disclaimerKey がある地域だけ表示） -->
+            <p class="disclaimer" id="disclaimer" hidden></p>
+
             <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link" id="privacyLink" data-i18n="privacy">プライバシーポリシー</a>
 
             <div id="bannerAdSpace" class="banner-ad-space"></div>
@@ -142,7 +145,7 @@
             <div class="formula-body" id="formulaBody">
                 <div class="formula-inner">
                     <div class="formula-line">
-                        <span class="formula-val" id="fVolume">--</span><span class="formula-unit">mL</span>
+                        <span class="formula-val" id="fVolume">--</span><span class="formula-unit" data-i18n="formula.volumeUnit">mL</span>
                         <span class="formula-op"> × </span>
                         <span class="formula-val" id="fDrop">--</span><span class="formula-unit" data-i18n="formula.dropUnit">滴/mL</span>
                     </div>
@@ -172,8 +175,10 @@
 
     <!-- 読み込み順：文言辞書 → チャンバー設定 → 地域プロファイル → 本体 -->
     <script src="i18n/ja.js"></script>
+    <script src="i18n/en-US.js"></script>
     <script src="chambers.js"></script>
     <script src="regions/jp.js"></script>
+    <script src="regions/us.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

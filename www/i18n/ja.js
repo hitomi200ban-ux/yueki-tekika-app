@@ -55,6 +55,7 @@ STRINGS['ja'] = {
     'sound.off':            '音OFF',
 
     // 結果画面：計算式パネル
+    'formula.volumeUnit':   'mL',
     'formula.dropUnit':     '滴/mL',
     'formula.hour':         '時間',
     'formula.minute':       '分',
@@ -67,5 +68,6 @@ STRINGS['ja'] = {
     'alert.volumeNotSelected': '輸液量を画像タップで選択してください。',
     'alert.volumeEmpty':    '輸液量を入力・決定してください。',
     'alert.tubing':         '輸液ルートの種類を選択してください。',
+    'alert.dropFactor':     '滴下係数を選択してください。',
     'alert.time':           '投与時間を選択してください。',
 };

@@ -7,6 +7,8 @@ window.REGIONS = window.REGIONS || {};
 REGIONS['JP'] = {
     id: 'JP',
     locale: 'ja',
+    // 端末の言語がこれで始まるときにこの地域を選ぶ
+    languages: ['ja'],
     privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/',
 
     // 輸液量プリセット（スワイパーの並び順。手動入力はこの後ろに付く）

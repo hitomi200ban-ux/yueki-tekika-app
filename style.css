@@ -327,6 +327,93 @@ h1 {
     background: #e1f5fe;
 }
 
+/* ルート名の下の補足（US版：滴下係数の範囲など） */
+.type-sub {
+    margin-top: -6px;
+    font-size: 11px;
+    font-weight: normal;
+    color: #78909c;
+}
+
+/* 滴下係数の選択（US版 Macrodrip：10 / 15 / 20 gtt/mL） */
+.factor-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.factor-group[hidden] {
+    display: none;
+}
+
+.factor-label,
+.factor-unit {
+    font-size: 13px;
+    font-weight: bold;
+    color: #455a64;
+    white-space: nowrap;
+}
+
+.factor-options {
+    display: flex;
+    gap: 8px;
+}
+
+.factor-btn {
+    min-width: 48px;
+    padding: 8px 0;
+    border: 2px solid #b3e5fc;
+    border-radius: 20px;
+    background: #fff;
+    color: #0288d1;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.factor-btn.active {
+    background: #fffde7;
+    color: #455a64;
+    border-color: #f9a825;
+}
+
+/* ルート選択欄の下の注意書き */
+.tubing-note {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #90a4ae;
+    text-align: center;
+}
+
+/* 輸液バッグ画像がまだない容量の代用カード */
+.volume-placeholder {
+    /* 輸液バッグ画像（高さ200px）と同じ高さにそろえる */
+    height: 200px;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #b3e5fc;
+    border-radius: 16px;
+    background: #f5fbff;
+    color: #0d47a1;
+}
+
+.volume-placeholder-num {
+    font-size: 44px;
+    font-weight: bold;
+    line-height: 1.1;
+}
+
+.volume-placeholder-unit {
+    font-size: 18px;
+    font-weight: bold;
+}
+
 /* 投与時間カード */
 .time-card {
     display: flex;
@@ -462,6 +549,15 @@ h1 {
 
 .calculate-btn:active {
     transform: scale(0.97);
+}
+
+/* 免責表示（US版など） */
+.disclaimer {
+    margin: 10px 16px 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #90a4ae;
+    text-align: center;
 }
 
 .privacy-link {
