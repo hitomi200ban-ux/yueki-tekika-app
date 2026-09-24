@@ -10,6 +10,8 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 広告バナーの実際の位置をページに伝えるプラグイン（Bridge の作成前に登録する）
+        registerPlugin(AdLayoutPlugin.class);
         // WebView のデバッグは Capacitor の既定に任せる（Debug ビルドでは有効、Release ビルドでは無効）
         super.onCreate(savedInstanceState);
 

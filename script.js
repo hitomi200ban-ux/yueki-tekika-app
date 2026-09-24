@@ -889,14 +889,29 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
     const bannerAdSpaceInput  = document.getElementById('bannerAdSpace');
     const bannerAdSpaceResult = document.getElementById('bannerAdSpaceResult');
     let bannerVisible = false;
-    let onResultScreen = false;
+    // 今どちらの画面か。広告の準備が終わる前に計算された場合もずれないよう、画面の実際の状態で判定する
+    const isResultScreen = () => resultScreen.classList.contains('active');
     let bannerHeightPx = 60; // 実測前の概算値（bannerAdSizeChangedで上書きされる）
+    // バナーが WebView の下端から持ち上がっている量（Android 15 以上でナビゲーションバーの高さ。AdLayoutPlugin から取得）
+    let bannerOffsetPx = 0;
+    // 画面の一番下のボタン（入力画面は地域切替リンク、結果画面は戻るボタン）と広告の間に必ず空けるすき間
+    const BANNER_GAP_PX = 12;
+
+    // バナーの実際の位置（持ち上がり量）を Android 側から取得する
+    async function refreshBannerOffset() {
+        const AdLayout = window.Capacitor.Plugins && window.Capacitor.Plugins.AdLayout;
+        if (!AdLayout) return;
+        try {
+            const res = await AdLayout.getBannerBottomOffset();
+            bannerOffsetPx = res && res.offset > 0 ? res.offset : 0;
+        } catch (e) { /* 取得できないときは持ち上がりなしとみなす */ }
+    }
 
     // 現在表示中の画面を一番下までスクロールしたときだけ広告を表示する。
-    // 広告はビューポート最下部に重なって表示されるため、広告の高さ分を
-    // 差し引いた位置を「一番下」とみなし、戻るボタン/プライバシーポリシーと重ならないようにする。
+    // 広告はビューポート最下部に重なって表示されるため、広告が覆う範囲（高さ＋持ち上がり量）を
+    // 差し引いた位置を「一番下」とみなし、戻るボタン/地域切替リンクと重ならないようにする。
     function updateBannerVisibility() {
-        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - bannerHeightPx - 1;
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - (bannerHeightPx + bannerOffsetPx) - 1;
         if (atBottom && !bannerVisible) {
             bannerVisible = true;
             AdMob.resumeBanner().catch(() => {});
@@ -908,27 +923,37 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
         }
     }
 
-    // 表示中の画面に応じて広告枠の高さを反映する（非表示側は常に高さ0）
-    function applyBannerSpaceHeight(heightPx) {
-        const inactiveSpace = onResultScreen ? bannerAdSpaceInput : bannerAdSpaceResult;
-        if (inactiveSpace) inactiveSpace.style.height = '0';
+    // 要素の下端のページ上の位置。画面切り替えのアニメーション（translateY）の影響を受けないよう、
+    // getBoundingClientRect ではなくレイアウト上の位置（offsetTop の合計）で求める
+    function layoutBottom(el) {
+        let y = el.offsetHeight;
+        for (let e = el; e; e = e.offsetParent) y += e.offsetTop;
+        return y;
+    }
 
-        if (onResultScreen) {
-            // 結果画面は1画面に収まるレイアウトでスクロール余地がほぼないため、
-            // 広告の実サイズちょうどの余白だと、端末のdp→px換算誤差（特に高密度エミュレータ等）で
-            // 広告が戻るボタンにわずかに重なることがある。そのため実サイズより少し多めに確保する。
-            const RESULT_SPACE_MARGIN_RATIO = 1.2;
-            if (bannerAdSpaceResult) bannerAdSpaceResult.style.height = heightPx > 0 ? Math.round(heightPx * RESULT_SPACE_MARGIN_RATIO) + 'px' : '0';
-        } else {
-            // 入力画面はプライバシーポリシー等の余白があるため、
-            // 古い端末のdp→px換算誤差を吸収する安全マージン係数で余白を詰める。
-            const BANNER_SPACE_SAFETY_RATIO = 0.5;
-            if (bannerAdSpaceInput) bannerAdSpaceInput.style.height = heightPx > 0 ? Math.round(heightPx * BANNER_SPACE_SAFETY_RATIO) + 'px' : '0';
-        }
+    // 表示中の画面に応じて広告枠の高さを反映する（非表示側は常に高さ0）。
+    // 一番下までスクロールしたとき、一番下のボタンの下端と広告の上端の間に BANNER_GAP_PX のすき間ができる高さにする
+    function applyBannerSpaceHeight(heightPx) {
+        const onResult = isResultScreen();
+        const space    = onResult ? bannerAdSpaceResult : bannerAdSpaceInput;
+        const inactive = onResult ? bannerAdSpaceInput : bannerAdSpaceResult;
+        if (inactive) inactive.style.height = '0';
+        if (!space) return;
+        if (heightPx <= 0) { space.style.height = '0'; return; }
+
+        const lastControl = onResult ? backBtn : document.getElementById('regionLink');
+        // 一番下のボタンの下端からページの末尾までのうち、広告枠以外の部分（body の余白など）
+        const controlBottom = layoutBottom(lastControl);
+        const tail = document.documentElement.scrollHeight - controlBottom - space.offsetHeight;
+        const needed = heightPx + bannerOffsetPx + BANNER_GAP_PX - tail;
+        space.style.height = Math.max(0, Math.ceil(needed)) + 'px';
     }
 
     try {
         await AdMob.initialize({});
+        // 持ち上がり量は画面の向きが変わらない限り一定なので、起動時に一度だけ取得する
+        // （通知ごとに取得を待つと、非表示→表示の通知の処理順が入れ替わり余白が 0 のまま残る）
+        await refreshBannerOffset();
 
         // 広告の表示/非表示に連動して広告枠の高さを切り替える（非表示中は高さ0）
         AdMob.addListener('bannerAdSizeChanged', (info) => {
@@ -936,7 +961,9 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
             if (info.height > 0) {
                 bannerHeightPx = info.height;
             }
-            applyBannerSpaceHeight(info.height > 0 ? info.height : 0);
+            // 非表示（高さ0）の通知が表示のあとに届くことがあるため、通知の値ではなく
+            // 今広告を出しているかどうかで余白を決める
+            applyBannerSpaceHeight(bannerVisible ? bannerHeightPx : 0);
             updateBannerVisibility();
         });
 
@@ -948,14 +975,12 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
 
         // 画面切り替え時は一旦非表示状態にリセットし、切り替え後の画面のスクロール位置で再判定する
         calculateBtn.addEventListener('click', () => {
-            onResultScreen = true;
             bannerVisible = false;
             AdMob.hideBanner().catch(() => {});
             applyBannerSpaceHeight(0);
             updateBannerVisibility();
         });
         backBtn.addEventListener('click', () => {
-            onResultScreen = false;
             bannerVisible = false;
             AdMob.hideBanner().catch(() => {});
             applyBannerSpaceHeight(0);
