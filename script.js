@@ -7,16 +7,36 @@ const DEFAULT_REGION_ID = 'US';
 // ユーザーが地域を選んだときの保存先
 const REGION_STORAGE_KEY = 'regionId';
 
-// 地域を決める：保存された選択 → 端末の言語 → 既定の地域
-function resolveRegionId() {
+// 保存済みの地域（なければ null）
+function loadSavedRegionId() {
     try {
         const saved = localStorage.getItem(REGION_STORAGE_KEY);
-        if (saved && REGIONS[saved]) return saved;
-    } catch (e) { /* 保存領域が使えない環境では端末の言語で決める */ }
+        return saved && REGIONS[saved] ? saved : null;
+    } catch (e) {
+        return null;   // 保存領域が使えない環境
+    }
+}
+
+function saveRegionId(regionId) {
+    try { localStorage.setItem(REGION_STORAGE_KEY, regionId); } catch (e) { /* 保存できなくても動作は続ける */ }
+}
+
+// 端末の言語から地域を判定する（日本語 → JP、それ以外 → 既定の US）
+function detectRegionFromLanguage() {
     const lang = (navigator.language || '').toLowerCase();
     const match = Object.keys(REGIONS).find(id =>
         (REGIONS[id].languages || []).some(prefix => lang.startsWith(prefix)));
     return match || DEFAULT_REGION_ID;
+}
+
+// 地域を決める：保存済みならそれを使う。初回起動（未保存）のときだけ端末の言語で判定して保存する。
+// 保存後は端末の言語が変わっても判定し直さない（変えるときは地域切替から）
+function resolveRegionId() {
+    const saved = loadSavedRegionId();
+    if (saved) return saved;
+    const detected = detectRegionFromLanguage();
+    saveRegionId(detected);
+    return detected;
 }
 
 const region  = REGIONS[resolveRegionId()];
@@ -118,7 +138,7 @@ function openRegionSheet() {
 
 // 選んだ地域を保存して読み込み直す
 function switchRegion(regionId) {
-    try { localStorage.setItem(REGION_STORAGE_KEY, regionId); } catch (e) { /* 保存できなくても今回は切り替える */ }
+    saveRegionId(regionId);
     // ネイティブの広告バナーはページを読み込み直しても残り、読み込み後に表示されなくなるため、先に取り除く
     const AdMob = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
     const removed = AdMob ? AdMob.removeBanner().catch(() => {}) : Promise.resolve();
