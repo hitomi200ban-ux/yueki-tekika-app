@@ -9,6 +9,9 @@ REGIONS['JP'] = {
     locale: 'ja',
     // 端末の言語がこれで始まるときにこの地域を選ぶ
     languages: ['ja'],
+    // 地域切替で表示する名前（その地域の言葉で）
+    nativeName: '日本',
+    languageName: '日本語',
     privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/',
 
     // 輸液量プリセット（スワイパーの並び順。手動入力はこの後ろに付く）

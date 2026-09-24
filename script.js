@@ -59,6 +59,75 @@ function applyStrings() {
 applyStrings();
 
 // ============================================================
+// 地域切替（入力画面の一番下のリンク → 地域の選択画面）
+// ============================================================
+function renderRegionSwitcher() {
+    const link = document.getElementById('regionLink');
+    link.textContent = t('region.current', { name: region.nativeName });
+    link.addEventListener('click', openRegionSheet);
+}
+
+function openRegionSheet() {
+    const overlay = document.createElement('div');
+    overlay.className = 'region-sheet';
+    const panel = document.createElement('div');
+    panel.className = 'region-sheet-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+
+    const title = document.createElement('p');
+    title.className = 'region-sheet-title';
+    title.textContent = t('region.title');
+    panel.appendChild(title);
+
+    Object.values(REGIONS).forEach(r => {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'region-option' + (r.id === region.id ? ' active' : '');
+        const name = document.createElement('span');
+        name.className = 'region-option-name';
+        name.textContent = r.nativeName;
+        const lang = document.createElement('span');
+        lang.className = 'region-option-lang';
+        lang.textContent = r.languageName;
+        option.append(name, lang);
+        option.addEventListener('click', () => {
+            if (r.id === region.id) { overlay.remove(); return; }
+            switchRegion(r.id);
+        });
+        panel.appendChild(option);
+    });
+
+    const note = document.createElement('p');
+    note.className = 'region-sheet-note';
+    note.textContent = t('region.note');
+    panel.appendChild(note);
+
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'region-sheet-cancel';
+    cancel.textContent = t('region.cancel');
+    cancel.addEventListener('click', () => overlay.remove());
+    panel.appendChild(cancel);
+
+    // パネルの外側をタップしても閉じる
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+}
+
+// 選んだ地域を保存して読み込み直す
+function switchRegion(regionId) {
+    try { localStorage.setItem(REGION_STORAGE_KEY, regionId); } catch (e) { /* 保存できなくても今回は切り替える */ }
+    // ネイティブの広告バナーはページを読み込み直しても残り、読み込み後に表示されなくなるため、先に取り除く
+    const AdMob = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
+    const removed = AdMob ? AdMob.removeBanner().catch(() => {}) : Promise.resolve();
+    removed.then(() => location.reload());
+}
+
+renderRegionSwitcher();
+
+// ============================================================
 // 滴下計算（全地域共通）
 // 滴下数（滴/分）= 輸液量(mL) × 滴下係数(滴/mL) ÷ 投与時間(分)
 // ============================================================

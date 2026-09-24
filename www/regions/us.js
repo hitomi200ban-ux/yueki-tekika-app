@@ -9,8 +9,10 @@ REGIONS['US'] = {
     locale: 'en-US',
     // 端末の言語がこれで始まるときにこの地域を選ぶ
     languages: ['en'],
-    // TODO: 英語版プライバシーポリシーができたら差し替える（Phase 3）
-    privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/',
+    // 地域切替で表示する名前（その地域の言葉で）
+    nativeName: 'United States',
+    languageName: 'English',
+    privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/en.html',
     // 入力画面に表示する免責文（i18n のキー）
     disclaimerKey: 'disclaimer',
 

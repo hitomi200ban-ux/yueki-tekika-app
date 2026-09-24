@@ -44,6 +44,12 @@ STRINGS['ja'] = {
     'calculate':            '計算する',
     'privacy':              'プライバシーポリシー',
 
+    // 地域切替
+    'region.current':       '🌐 地域：{name}',
+    'region.title':         '地域を選択',
+    'region.note':          '滴下係数や単位の表記が、選んだ地域の臨床に合わせて変わります。',
+    'region.cancel':        'キャンセル',
+
     // 結果画面
     'result.rateLabel':     '滴下速度',
     'result.rateUnit':      '滴/分',

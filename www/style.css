@@ -575,6 +575,103 @@ h1 {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* 地域切替のリンク（プライバシーポリシーの下） */
+.region-link {
+    display: block;
+    margin: 6px auto 0;
+    padding: 4px 8px;
+    border: none;
+    background: none;
+    font-size: 11px;
+    color: #90a4ae;
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 地域の選択画面（画面中央。下部の広告バナーと重ならないように） */
+.region-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.region-sheet-panel {
+    width: 100%;
+    max-width: 320px;
+    padding: 20px 18px 14px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.region-sheet-title {
+    margin-bottom: 14px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #455a64;
+}
+
+.region-option {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 14px 16px;
+    border: 2px solid #b3e5fc;
+    border-radius: 12px;
+    background: #fff;
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.region-option.active {
+    border-color: #f9a825;
+    background: #fffde7;
+}
+
+.region-option-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #0288d1;
+}
+
+.region-option.active .region-option-name {
+    color: #455a64;
+}
+
+.region-option-lang {
+    font-size: 13px;
+    color: #78909c;
+}
+
+.region-sheet-note {
+    margin: 4px 2px 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #90a4ae;
+}
+
+.region-sheet-cancel {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: #0288d1;
+    cursor: pointer;
+}
+
 /* バナー広告スペース（ネイティブ広告はAndroid側でこの位置に重なる） */
 /* 広告非表示中は高さ0、表示中はJSでheightを実サイズに切り替える */
 .banner-ad-space {

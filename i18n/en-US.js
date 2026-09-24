@@ -49,6 +49,12 @@ STRINGS['en-US'] = {
 
     'calculate':            'Calculate',
     'privacy':              'Privacy Policy',
+
+    // 地域切替
+    'region.current':       '🌐 Region: {name}',
+    'region.title':         'Choose your region',
+    'region.note':          'Drop factors and units follow clinical practice in the selected region.',
+    'region.cancel':        'Cancel',
     'disclaimer':           'For educational and reference use only. Always verify calculations and follow your facility\'s policies and procedures.',
 
     // 結果画面
