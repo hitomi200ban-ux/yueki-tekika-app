@@ -71,6 +71,11 @@ h1 {
     font-weight: normal;
 }
 
+/* 英語表示のサブタイトル：2行になるときは行の長さをそろえ、「&」だけが行末に残らないようにする */
+:lang(en) .app-subtitle {
+    text-wrap: balance;
+}
+
 /* フォームグループ */
 .form-group {
     margin-bottom: 24px;
@@ -853,6 +858,12 @@ h1 {
     font-size: 15px;
     font-weight: normal;
     color: #0288d1;
+}
+
+/* 英語表示の結果画面サブタイトル：高さ固定の1行枠なので、文字を少し小さくして1行に収める */
+:lang(en) .result-subtitle {
+    font-size: min(13px, 3.4vw);
+    white-space: nowrap;
 }
 
 /* 結果画面レイアウト */
