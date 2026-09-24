@@ -66,6 +66,20 @@ function calcDropRate(volumeMl, dropFactor, totalMinutes) {
     return (volumeMl * dropFactor) / totalMinutes;
 }
 
+// 表示用の四捨五入。浮動小数点の誤差で境目の値（0.45 が 0.44999… になる等）が
+// 切り下がらないよう、ごく小さな値を足してから丸める
+const ROUND_EPSILON = 1e-9;
+
+// 最も近い整数へ四捨五入
+function roundHalfUp(x) {
+    return Math.round(x + ROUND_EPSILON);
+}
+
+// 小数第1位へ四捨五入した文字列
+function toFixed1(x) {
+    return (Math.round(x * 10 + ROUND_EPSILON) / 10).toFixed(1);
+}
+
 // ============================================================
 // 状態変数
 // ============================================================
@@ -379,9 +393,9 @@ calculateBtn.addEventListener('click', () => {
     const dropRate = calcDropRate(volume, dropFactor, hours * 60);
     const dropInterval = 60 / dropRate;
 
-    const dropRateRound = Math.round(dropRate);
-    const dropRateExact = dropRate.toFixed(1);
-    const secPerDrop = (60 / dropRate).toFixed(1);
+    const dropRateRound = roundHalfUp(dropRate);
+    const dropRateExact = toFixed1(dropRate);
+    const secPerDrop = toFixed1(60 / dropRate);
 
     dropRateDisplay.textContent = dropRateRound;
     document.getElementById('dropRateExact').textContent = dropRateExact;
@@ -395,8 +409,8 @@ calculateBtn.addEventListener('click', () => {
     document.getElementById('fHour').textContent     = parseInt(hourSelect.value);
     document.getElementById('fMin').textContent      = String(parseInt(minuteSelect.value)).padStart(2, '0');
     document.getElementById('fTotalMin').textContent = Math.round(hours * 60);
-    document.getElementById('fExact').textContent    = dropRate.toFixed(1);
-    document.getElementById('fApprox').textContent   = Math.round(dropRate);
+    document.getElementById('fExact').textContent    = toFixed1(dropRate);
+    document.getElementById('fApprox').textContent   = roundHalfUp(dropRate);
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
     document.body.style.padding = '0';
