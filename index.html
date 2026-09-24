@@ -11,56 +11,44 @@
         <!-- 入力画面 -->
         <div id="inputScreen" class="screen active">
             <div class="app-title-wrap">
-                <h1 class="app-title">輸液滴下計算</h1>
-                <p class="app-subtitle">看護師・看護学生向け点滴滴下計算アプリ</p>
+                <h1 class="app-title" data-i18n="app.title">輸液滴下計算</h1>
+                <p class="app-subtitle" data-i18n="app.subtitle">看護師・看護学生向け点滴滴下計算アプリ</p>
             </div>
 
             <div class="form-group">
                 <div class="label-hint-row">
-                    <label>輸液量</label>
-                    <p class="swipe-hint">左右にスワイプ・タップで選択</p>
+                    <label data-i18n="volume.label">輸液量</label>
+                    <p class="swipe-hint" data-i18n="volume.hint">左右にスワイプ・タップで選択</p>
                 </div>
                 <div class="volume-swiper-wrapper">
                     <button class="swiper-arrow left" id="prevBtn">&#8249;</button>
                     <div class="volume-swiper">
                         <div class="swiper-track" id="swiperTrack">
-                            <div class="swiper-item" data-volume="1500"><img src="./img/1500ml.PNG" alt="1500ml"></div>
-                            <div class="swiper-item" data-volume="500"><img src="./img/500ml.PNG" alt="500ml"></div>
-                            <div class="swiper-item" data-volume="200"><img src="./img/200ml.PNG" alt="200ml"></div>
-                            <div class="swiper-item" data-volume="100"><img src="./img/100ml.PNG" alt="100ml"></div>
-                            <div class="swiper-item" data-volume="50"><img src="./img/50ml.PNG" alt="50ml"></div>
+                            <!-- 輸液量プリセットは地域プロファイルから script.js で生成（手動入力の前に挿入） -->
                             <div class="swiper-item" data-volume="manual">
                                 <div class="manual-input-box">
-                                    <p class="manual-label">手動で入力</p>
-                                    <input type="number" id="manualVolume" placeholder="例：250" min="1" step="1" enterkeyhint="done">
-                                    <button id="manualConfirmBtn" class="manual-confirm-btn">決定</button>
+                                    <p class="manual-label" data-i18n="volume.manualLabel">手動で入力</p>
+                                    <input type="number" id="manualVolume" placeholder="例：250" data-i18n-placeholder="volume.manualPlaceholder" min="1" step="1" enterkeyhint="done">
+                                    <button id="manualConfirmBtn" class="manual-confirm-btn" data-i18n="volume.manualConfirm">決定</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <button class="swiper-arrow right" id="nextBtn">&#8250;</button>
                 </div>
-                <p class="selected-volume-label"><span id="selectedVolumeText">未選択</span></p>
+                <p class="selected-volume-label"><span id="selectedVolumeText" data-i18n="volume.none">未選択</span></p>
             </div>
 
             <div class="form-group">
-                <label>輸液ルートの種類</label>
-                <div class="button-group">
-                    <button id="adultBtn" class="type-btn" data-type="adult">
-                        <img src="./img/seizinyou.PNG" alt="成人用">
-                        <span>成人用（20滴/mL）</span>
-                    </button>
-                    <button id="childBtn" class="type-btn" data-type="child">
-                        <img src="./img/sixyouniyou.PNG" alt="小児用">
-                        <span>小児用（60滴/mL）</span>
-                    </button>
-                </div>
+                <label data-i18n="tubing.label">輸液ルートの種類</label>
+                <!-- 輸液ルートのボタンは地域プロファイルから script.js で生成 -->
+                <div class="button-group" id="tubingGroup"></div>
             </div>
 
             <div class="form-group">
                 <div class="label-hint-row">
-                    <label>投与時間</label>
-                    <p class="swipe-hint">数字をタップして選択</p>
+                    <label data-i18n="time.label">投与時間</label>
+                    <p class="swipe-hint" data-i18n="time.hint">数字をタップして選択</p>
                 </div>
                 <div class="time-card">
                     <div class="time-spinner-wrap">
@@ -78,7 +66,7 @@
                         </select>
                         <button class="time-arrow-btn" id="hourDown">▼</button>
                     </div>
-                    <span class="time-label">時間</span>
+                    <span class="time-label" data-i18n="time.hour">時間</span>
                     <div class="time-spinner-wrap">
                         <button class="time-arrow-btn" id="minuteUp">▲</button>
                         <select id="minuteSelect" class="time-select">
@@ -89,20 +77,20 @@
                         </select>
                         <button class="time-arrow-btn" id="minuteDown">▼</button>
                     </div>
-                    <span class="time-label">分</span>
+                    <span class="time-label" data-i18n="time.minute">分</span>
                 </div>
             </div>
 
-            <p class="summary-title">計算式</p>
+            <p class="summary-title" data-i18n="summary.title">計算式</p>
             <div class="confirm-summary" id="confirmSummary">
-                <span class="summary-value" id="summaryVolume">--</span><span class="summary-unit"> mL</span> <span class="summary-operator">×</span> <span class="summary-value" id="summaryDrop">--</span><span class="summary-unit">滴/mL</span>
+                <span class="summary-value" id="summaryVolume">--</span><span class="summary-unit"> mL</span> <span class="summary-operator">×</span> <span class="summary-value" id="summaryDrop">--</span><span class="summary-unit" data-i18n="summary.dropUnit">滴/mL</span>
                 <div class="summary-divider"></div>
-                <span class="summary-value" id="summaryHour">--</span><span class="summary-unit">時間</span><span class="summary-value" id="summaryMin">--</span><span class="summary-unit">分（</span><span class="summary-value" id="summaryTotalMin">--</span><span class="summary-unit">分）</span>
+                <span class="summary-value" id="summaryHour">--</span><span class="summary-unit" data-i18n="summary.hour">時間</span><span class="summary-value" id="summaryMin">--</span><span class="summary-unit" data-i18n="summary.minOpen">分（</span><span class="summary-value" id="summaryTotalMin">--</span><span class="summary-unit" data-i18n="summary.minClose">分）</span>
             </div>
 
-            <button id="calculateBtn" class="calculate-btn">計算する</button>
+            <button id="calculateBtn" class="calculate-btn" data-i18n="calculate">計算する</button>
 
-            <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link">プライバシーポリシー</a>
+            <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link" id="privacyLink" data-i18n="privacy">プライバシーポリシー</a>
 
             <div id="bannerAdSpace" class="banner-ad-space"></div>
         </div>
@@ -110,51 +98,43 @@
         <!-- 結果画面 -->
         <div id="resultScreen" class="screen result-screen-layout">
 
-            <div class="result-title">輸液滴下計算</div>
-            <div class="result-subtitle">看護師・看護学生向け点滴滴下計算アプリ</div>
+            <div class="result-title" data-i18n="app.title">輸液滴下計算</div>
+            <div class="result-subtitle" data-i18n="app.subtitle">看護師・看護学生向け点滴滴下計算アプリ</div>
 
             <!-- チャンバー中央・数値を四隅に配置 -->
             <div class="result-card">
                 <!-- 左上：滴下速度 -->
                 <div class="rn-topleft">
-                    <div class="rn-label">滴下速度</div>
+                    <div class="rn-label" data-i18n="result.rateLabel">滴下速度</div>
                     <div class="rn-rate-wrap">
                         <span class="rn-rate" id="dropRate">--</span>
                     </div>
-                    <div class="rn-unit">滴/分</div>
+                    <div class="rn-unit" data-i18n="result.rateUnit">滴/分</div>
                     <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
                 </div>
 
                 <!-- 右上：音ボタン -->
                 <button id="soundBtn" class="sound-btn-v sound-btn-corner" data-on="false">
                     <span class="sound-icon">🔇</span>
-                    <span class="sound-label-v">音OFF</span>
+                    <span class="sound-label-v" data-i18n="sound.off">音OFF</span>
                 </button>
 
                 <!-- 中央：アニメーション -->
-                <div class="result-center">
-                    <div class="chamber-wrap" id="chamberAdult">
-                        <img src="./img/seizinyou_tekika.PNG" id="chamberImg" class="chamber-img">
-                        <canvas id="dropCanvas"></canvas>
-                    </div>
-                    <div class="chamber-wrap" id="chamberChild" style="display:none;">
-                        <img src="./img/sixyouni_tekika.PNG" id="chamberImgChild" class="chamber-img">
-                        <canvas id="dropCanvasChild"></canvas>
-                    </div>
-                </div>
+                <!-- チャンバー画像とCanvasは地域プロファイルから script.js で生成 -->
+                <div class="result-center" id="chamberArea"></div>
 
                 <!-- 右下：計算式ボタン -->
                 <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
-                    <span>計算式</span>
+                    <span data-i18n="result.formulaToggle">計算式</span>
                 </button>
 
                 <!-- 左下：合わせ方 -->
                 <div class="rn-bottomleft">
-                    <div class="rn-label">合わせ方</div>
+                    <div class="rn-label" data-i18n="result.intervalLabel">合わせ方</div>
                     <div class="rn-sec-wrap">
                         <span class="rn-sec" id="dropIntervalSec">--</span>
                     </div>
-                    <div class="rn-sec-unit">秒に1滴</div>
+                    <div class="rn-sec-unit" data-i18n="result.intervalUnit">秒に1滴</div>
                 </div>
             </div>
 
@@ -164,19 +144,19 @@
                     <div class="formula-line">
                         <span class="formula-val" id="fVolume">--</span><span class="formula-unit">mL</span>
                         <span class="formula-op"> × </span>
-                        <span class="formula-val" id="fDrop">--</span><span class="formula-unit">滴/mL</span>
+                        <span class="formula-val" id="fDrop">--</span><span class="formula-unit" data-i18n="formula.dropUnit">滴/mL</span>
                     </div>
                     <div class="formula-divider"></div>
                     <div class="formula-line formula-time">
-                        <span class="formula-val" id="fHour">--</span><span class="formula-unit">時間</span>
-                        <span class="formula-val" id="fMin">--</span><span class="formula-unit">分</span>
-                        <span class="formula-paren">（<span id="fTotalMin">--</span>分）</span>
+                        <span class="formula-val" id="fHour">--</span><span class="formula-unit" data-i18n="formula.hour">時間</span>
+                        <span class="formula-val" id="fMin">--</span><span class="formula-unit" data-i18n="formula.minute">分</span>
+                        <span class="formula-paren"><span data-i18n="formula.parenOpen">（</span><span id="fTotalMin">--</span><span data-i18n="formula.parenClose">分）</span></span>
                     </div>
                     <div class="formula-result-line">
-                        <span class="formula-eq">= </span><span class="formula-exact" id="fExact">--</span><span class="formula-unit"> 滴/分</span>
+                        <span class="formula-eq">= </span><span class="formula-exact" id="fExact">--</span><span class="formula-unit" data-i18n="formula.resultUnit"> 滴/分</span>
                     </div>
                     <div class="formula-result-line">
-                        <span class="formula-eq">≈ </span><span class="formula-approx" id="fApprox">--</span><span class="formula-unit"> 滴/分</span>
+                        <span class="formula-eq">≈ </span><span class="formula-approx" id="fApprox">--</span><span class="formula-unit" data-i18n="formula.resultUnit"> 滴/分</span>
                     </div>
                 </div>
             </div>
@@ -184,12 +164,16 @@
             <!-- 旧IDを維持（アニメーション用） -->
             <span id="dropInterval" style="display:none;"></span>
 
-            <button id="backBtn" class="back-btn">戻る</button>
+            <button id="backBtn" class="back-btn" data-i18n="result.back">戻る</button>
 
             <div id="bannerAdSpaceResult" class="banner-ad-space"></div>
         </div>
     </div>
 
+    <!-- 読み込み順：文言辞書 → チャンバー設定 → 地域プロファイル → 本体 -->
+    <script src="i18n/ja.js"></script>
+    <script src="chambers.js"></script>
+    <script src="regions/jp.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

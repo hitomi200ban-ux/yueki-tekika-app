@@ -189,7 +189,8 @@ h1 {
 }
 
 .swiper-item.confirmed::after {
-    content: '✓ 決定';
+    /* 文言は script.js が --decided-label に地域の言語で設定する */
+    content: var(--decided-label, '✓ 決定');
     position: absolute;
     top: 8px;
     right: 16px;
@@ -309,7 +310,8 @@ h1 {
 }
 
 .type-btn.active::after {
-    content: '✓ 決定';
+    /* 文言は script.js が --decided-label に地域の言語で設定する */
+    content: var(--decided-label, '✓ 決定');
     position: absolute;
     top: 6px;
     right: 8px;
@@ -962,8 +964,7 @@ h1 {
     object-fit: contain;
 }
 
-#dropCanvas,
-#dropCanvasChild {
+.drop-canvas {
     position: absolute;
     top: 0;
     left: 0;

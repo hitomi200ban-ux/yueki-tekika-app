@@ -1,24 +1,67 @@
 // ============================================================
+// 地域・言語
+// 地域（臨床ルール）は regions/、文言は i18n/、チャンバー画像は chambers.js に置く
+// ============================================================
+// 現在は日本版のみ。US版追加時に端末の言語・ユーザーの選択から決めるようにする
+const ACTIVE_REGION_ID = 'JP';
+const region  = REGIONS[ACTIVE_REGION_ID];
+const strings = STRINGS[region.locale];
+
+// 文言を取得する（{name} を vars の値で置換）
+function t(key, vars) {
+    let s = strings[key];
+    if (s === undefined) { console.warn('Missing string:', key); return key; }
+    if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+    return s;
+}
+
+// HTML の data-i18n / data-i18n-placeholder に文言を反映する
+function applyStrings() {
+    document.documentElement.lang = region.locale;
+    document.title = t('doc.title');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    // CSS の ::after（「✓ 決定」バッジ）用
+    document.documentElement.style.setProperty('--decided-label', JSON.stringify(t('common.decided')));
+    document.getElementById('privacyLink').href = region.privacyUrl;
+}
+
+applyStrings();
+
+// ============================================================
+// 滴下計算（全地域共通）
+// 滴下数（滴/分）= 輸液量(mL) × 滴下係数(滴/mL) ÷ 投与時間(分)
+// ============================================================
+function calcDropRate(volumeMl, dropFactor, totalMinutes) {
+    return (volumeMl * dropFactor) / totalMinutes;
+}
+
+// ============================================================
 // 状態変数
 // ============================================================
-let selectedType = null;
+let selectedTubing = null;   // region.tubing の要素
+let selectedFactor = null;   // 滴下係数（滴/mL）
 let currentIndex = 0;
 let manualVolume = null;
 let confirmedIndex = null;
 
-const volumes = [1500, 500, 200, 100, 50, null];
+// プリセットの輸液量＋末尾の手動入力（null）
+const volumes = [...region.volumes.map(v => v.ml), null];
+const MANUAL_INDEX = volumes.length - 1;
 
 // ============================================================
 // 要素取得
 // ============================================================
 const inputScreen         = document.getElementById('inputScreen');
 const resultScreen        = document.getElementById('resultScreen');
-const adultBtn            = document.getElementById('adultBtn');
-const childBtn            = document.getElementById('childBtn');
+const tubingGroup         = document.getElementById('tubingGroup');
 const calculateBtn        = document.getElementById('calculateBtn');
 const backBtn             = document.getElementById('backBtn');
 const dropRateDisplay     = document.getElementById('dropRate');
-const dropIntervalDisplay = document.getElementById('dropInterval');
 const swiperTrack         = document.getElementById('swiperTrack');
 const selectedVolumeText  = document.getElementById('selectedVolumeText');
 
@@ -38,12 +81,11 @@ function updateSummary() {
     const vol = confirmedIndex !== null
         ? (volumes[confirmedIndex] !== null ? volumes[confirmedIndex] : manualVolume)
         : null;
-    const dropLabel = selectedType === 'adult' ? '20滴/mL' : '60滴/mL';
     const h = parseInt(hourSelect.value);
     const m = parseInt(minuteSelect.value);
     const totalMin = h * 60 + m;
     document.getElementById('summaryVolume').textContent = vol ? vol : '--';
-    document.getElementById('summaryDrop').textContent = selectedType === 'adult' ? '20' : selectedType === 'child' ? '60' : '--';
+    document.getElementById('summaryDrop').textContent = selectedFactor !== null ? selectedFactor : '--';
     document.getElementById('summaryHour').textContent = h;
     document.getElementById('summaryMin').textContent = String(m).padStart(2, '0');
     document.getElementById('summaryTotalMin').textContent = totalMin;
@@ -52,6 +94,23 @@ function updateSummary() {
 // ============================================================
 // 輸液量スワイパー
 // ============================================================
+// プリセット画像を地域プロファイルから生成し、手動入力の前に並べる
+function renderVolumePresets() {
+    const manualItem = swiperTrack.querySelector('.swiper-item[data-volume="manual"]');
+    region.volumes.forEach(v => {
+        const item = document.createElement('div');
+        item.className = 'swiper-item';
+        item.dataset.volume = v.ml;
+        const img = document.createElement('img');
+        img.src = v.image;
+        img.alt = v.ml + 'ml';
+        item.appendChild(img);
+        swiperTrack.insertBefore(item, manualItem);
+    });
+}
+
+renderVolumePresets();
+
 function updateSwiper(index) {
     currentIndex = index;
     swiperTrack.style.transform = 'translateX(-' + (index * 100) + '%)';
@@ -68,7 +127,7 @@ function confirmSelection(index) {
         el.classList.remove('browsing');
     });
     // 手動以外が選択されたら決定ボタンをリセット
-    if (index !== 5) {
+    if (index !== MANUAL_INDEX) {
         document.getElementById('manualConfirmBtn').classList.remove('decided');
     }
     refreshVolumeLabel();
@@ -77,13 +136,13 @@ function confirmSelection(index) {
 
 function refreshVolumeLabel() {
     if (confirmedIndex === null) {
-        selectedVolumeText.textContent = '未選択';
+        selectedVolumeText.textContent = t('volume.none');
         return;
     }
     if (volumes[confirmedIndex] !== null) {
-        selectedVolumeText.textContent = volumes[confirmedIndex] + ' mL 選択中';
+        selectedVolumeText.textContent = t('volume.selected', { v: volumes[confirmedIndex] });
     } else {
-        selectedVolumeText.textContent = manualVolume ? (manualVolume + ' mL 選択中') : '未入力';
+        selectedVolumeText.textContent = manualVolume ? t('volume.selected', { v: manualVolume }) : t('volume.manualEmpty');
     }
 }
 
@@ -118,9 +177,9 @@ const manualVolumeInput = document.getElementById('manualVolume');
 
 function confirmManualVolume() {
     const val = parseFloat(manualVolumeInput.value);
-    if (!val || val <= 0) { alert('正しい数値を入力してください。'); return; }
+    if (!val || val <= 0) { alert(t('alert.invalidManual')); return; }
     manualVolume = val;
-    confirmSelection(5);
+    confirmSelection(MANUAL_INDEX);
     document.getElementById('manualConfirmBtn').classList.add('decided');
 }
 
@@ -135,7 +194,7 @@ manualVolumeInput.addEventListener('keydown', (e) => {
     }
 });
 
-updateSwiper(1);
+updateSwiper(region.initialVolumeIndex);
 
 // ============================================================
 // 投与時間 ▲▼ボタン
@@ -158,37 +217,49 @@ document.getElementById('minuteDown').addEventListener('click', () => {
 });
 
 // ============================================================
-// ルート種類選択
+// ルート種類選択（地域プロファイルの tubing から生成）
 // ============================================================
-adultBtn.addEventListener('click', () => {
-    selectedType = 'adult';
-    adultBtn.classList.add('active');
-    childBtn.classList.remove('active');
+function selectTubing(tubing, btn) {
+    selectedTubing = tubing;
+    // 滴下係数が1つだけのルートは、ボタン選択で係数も確定する
+    selectedFactor = tubing.factors.length === 1 ? tubing.factors[0] : null;
+    tubingGroup.querySelectorAll('.type-btn').forEach(el => el.classList.toggle('active', el === btn));
     updateSummary();
-});
+}
 
-childBtn.addEventListener('click', () => {
-    selectedType = 'child';
-    childBtn.classList.add('active');
-    adultBtn.classList.remove('active');
-    updateSummary();
-});
+function renderTubingButtons() {
+    region.tubing.forEach(tubing => {
+        const btn = document.createElement('button');
+        btn.className = 'type-btn';
+        btn.dataset.type = tubing.id;
+        const img = document.createElement('img');
+        img.src = tubing.image;
+        img.alt = t(tubing.altKey);
+        const label = document.createElement('span');
+        label.textContent = t(tubing.labelKey);
+        btn.append(img, label);
+        btn.addEventListener('click', () => selectTubing(tubing, btn));
+        tubingGroup.appendChild(btn);
+    });
+}
+
+renderTubingButtons();
 
 // ============================================================
 // 計算ボタン
 // ============================================================
 calculateBtn.addEventListener('click', () => {
-    if (confirmedIndex === null) { alert('輸液量を画像タップで選択してください。'); return; }
+    if (confirmedIndex === null) { alert(t('alert.volumeNotSelected')); return; }
     const volume = volumes[confirmedIndex] !== null ? volumes[confirmedIndex] : manualVolume;
     const h = parseInt(hourSelect.value);
     const m = parseInt(minuteSelect.value);
     const hours = h + m / 60;
-    if (!volume || volume <= 0) { alert('輸液量を入力・決定してください。'); return; }
-    if (!selectedType) { alert('輸液ルートの種類を選択してください。'); return; }
-    if (hours <= 0) { alert('投与時間を選択してください。'); return; }
+    if (!volume || volume <= 0) { alert(t('alert.volumeEmpty')); return; }
+    if (!selectedFactor) { alert(t('alert.tubing')); return; }
+    if (hours <= 0) { alert(t('alert.time')); return; }
 
-    const dropFactor = selectedType === 'adult' ? 20 : 60;
-    const dropRate = (volume * dropFactor) / (hours * 60);
+    const dropFactor = selectedFactor;
+    const dropRate = calcDropRate(volume, dropFactor, hours * 60);
     const dropInterval = 60 / dropRate;
 
     const dropRateRound = Math.round(dropRate);
@@ -199,7 +270,7 @@ calculateBtn.addEventListener('click', () => {
     document.getElementById('dropRateExact').textContent = dropRateExact;
     document.getElementById('dropIntervalSec').textContent = secPerDrop;
 
-    const secColor = selectedType === 'adult' ? '#66bb6a' : '#f48fb1';
+    const secColor = selectedTubing.accentColor;
     document.getElementById('dropIntervalSec').style.color = secColor;
     document.querySelectorAll('.rn-sec-unit').forEach(el => el.style.color = secColor);
     document.getElementById('fVolume').textContent   = volume;
@@ -213,17 +284,15 @@ calculateBtn.addEventListener('click', () => {
     resultScreen.classList.add('active');
     document.body.style.padding = '0';
 
-    if (selectedType === 'child') {
-        document.getElementById('chamberAdult').style.display = 'none';
-        document.getElementById('chamberChild').style.display = 'block';
-        stopDropAnimation();
-        startChildDropAnimation(dropInterval);
-    } else {
-        document.getElementById('chamberAdult').style.display = 'block';
-        document.getElementById('chamberChild').style.display = 'none';
-        stopChildDropAnimation();
-        startDropAnimation(dropInterval);
-    }
+    // 選択したルートのチャンバーだけを表示してアニメーションを開始
+    const activeChamber = selectedTubing.chamber;
+    Object.keys(chamberViews).forEach(key => {
+        chamberViews[key].wrap.style.display = key === activeChamber ? 'block' : 'none';
+    });
+    Object.keys(chamberViews).forEach(key => {
+        if (key !== activeChamber) chamberViews[key].animator.stop();
+    });
+    chamberViews[activeChamber].animator.start(dropInterval);
     startTickSound(dropInterval);
 });
 
@@ -242,14 +311,13 @@ document.getElementById('formulaToggle').addEventListener('click', () => {
 // 戻るボタン
 // ============================================================
 backBtn.addEventListener('click', () => {
-    stopDropAnimation();
-    stopChildDropAnimation();
+    Object.keys(chamberViews).forEach(key => chamberViews[key].animator.stop());
     stopTickSound();
     // 音をOFFにリセット
     soundOn = false;
     soundBtn.dataset.on = 'false';
     soundBtn.querySelector('.sound-icon').textContent    = '🔇';
-    soundBtn.querySelector('.sound-label-v').textContent = '音OFF';
+    soundBtn.querySelector('.sound-label-v').textContent = t('sound.off');
     // アコーディオンをリセット
     document.getElementById('formulaToggle').setAttribute('aria-expanded', 'false');
     document.getElementById('formulaBody').classList.remove('open');
@@ -300,7 +368,7 @@ soundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
     soundBtn.dataset.on = soundOn;
     soundBtn.querySelector('.sound-icon').textContent    = soundOn ? '🔊' : '🔇';
-    soundBtn.querySelector('.sound-label-v').textContent = soundOn ? '音ON' : '音OFF';
+    soundBtn.querySelector('.sound-label-v').textContent = soundOn ? t('sound.on') : t('sound.off');
     if (soundOn) {
         startTickSound(currentTickInterval);
     } else {
@@ -310,12 +378,10 @@ soundBtn.addEventListener('click', () => {
 
 // ============================================================
 // Canvas滴下アニメーション（画像スプライト方式）
+// チャンバーごとの座標・サイズ・波紋は chambers.js の設定で切り替える
 // ============================================================
-const canvas     = document.getElementById('dropCanvas');
-const ctx        = canvas.getContext('2d');
-const chamberImg = document.getElementById('chamberImg');
 
-// 水滴画像の事前読み込み
+// 水滴画像の事前読み込み（全チャンバー共通）
 const dropImgs = [null, null, null, null];
 [1,2,3,4].forEach(i => {
     const img = new Image();
@@ -323,421 +389,258 @@ const dropImgs = [null, null, null, null];
     dropImgs[i - 1] = img;
 });
 
-// seizinyou_tekika.PNG上の緑先端位置（画像サイズに対する割合）
-const TIP_RATIO = { x: 0.50, y: 0.295 };
-
-// 将来: liquidLevel(0〜1)を残量と連動させると液面が変化する
-let liquidLevel = 0.62;
-
-let tipX = 0, tipY = 0, canvasW = 0, canvasH = 0;
-let animFrameId    = null;
-let dropIntervalId = null;
-let lastTime       = null;
-let drops          = [];
-let ripples        = [];
-let surfaceWaves   = [];
-
-// 各フェーズの画像サイズ（canvas px）
-const DROP_SIZE = {
-    grow:   { w: 22, h: 14 },
-    fall:   { w: 23, h: 23 },
-    splash: { w: 32, h: 20 },
-};
-
-// フェーズ継続時間（ms）
-const PHASE_MS = { grow: 480 };
+// 成長フェーズの継続時間（ms）
+const GROW_MS = 480;
 // 着水フェード時間（ms）
 const SPLASH_MS = 220;
 
-function initCanvas() {
-    canvasW = chamberImg.offsetWidth;
-    canvasH = chamberImg.offsetHeight;
-    canvas.width  = canvasW;
-    canvas.height = canvasH;
-    canvas.style.width  = canvasW + 'px';
-    canvas.style.height = canvasH + 'px';
-    tipX = canvasW * TIP_RATIO.x;
-    tipY = canvasH * TIP_RATIO.y;
+// n フレーム待ってから fn を実行する（0 なら即実行）
+function afterFrames(n, fn) {
+    if (n <= 0) { fn(); return; }
+    requestAnimationFrame(() => afterFrames(n - 1, fn));
 }
 
-function getSurfaceY() {
-    // seizinyou_tekika.PNG の水面位置に固定（画像高さの約62%）
-    return canvasH * 0.62;
-}
+// チャンバー1つ分のアニメーションを作る（cfg は chambers.js の設定）
+function createDropAnimator(cfg, chamberImg, canvas) {
+    const ctx = canvas.getContext('2d');
 
-function spawnDrop() {
-    drops.push({
-        phase: 'grow',
-        x: tipX,
-        y: tipY + DROP_SIZE.grow.h,
-        vy: 0,
-        elapsed: 0,   // フェーズ内の経過ms
-    });
-}
+    let tipX = 0, tipY = 0, canvasW = 0, canvasH = 0;
+    let animFrameId    = null;
+    let dropIntervalId = null;
+    let lastTime       = null;
+    let drops          = [];
+    let ripples        = [];
+    let surfaceWaves   = [];
 
-function updateDrops(dt) {
-    const surfaceY = getSurfaceY();
-    // 物理: 60fps基準で正規化
-    const dtFactor = dt / (1000 / 60);
-
-    drops = drops.filter(d => {
-        d.elapsed += dt;
-
-        if (d.phase === 'grow') {
-            if (d.elapsed >= PHASE_MS.grow) {
-                d.phase   = 'fall';
-                d.elapsed = 0;
-                d.vy      = 1.8;
-            }
-
-        } else if (d.phase === 'fall') {
-            d.vy += 0.32 * dtFactor;
-            d.y  += d.vy * dtFactor;
-            const splashThreshold = surfaceY - DROP_SIZE.splash.h * 0.3;
-            if (d.y >= splashThreshold) {
-                d.phase   = 'splash';
-                d.y       = surfaceY;
-                d.elapsed = 0;
-                ripples.push({ x: d.x, y: surfaceY, r: 3, maxR: 28, alpha: 0.65 });
-                surfaceWaves.push({ x: d.x, amp: 3.5, elapsed: 0 });
-                // 着水タイミングで音を鳴らす
-                if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
-            }
-
-        } else if (d.phase === 'splash') {
-            if (d.elapsed >= SPLASH_MS) return false;
-        }
-        return true;
-    });
-}
-
-function updateRipples(dt) {
-    const dtFactor = dt / (1000 / 60);
-    ripples = ripples.filter(rp => {
-        rp.r     += (rp.maxR - rp.r) * 0.10 * dtFactor;
-        rp.alpha -= 0.018 * dtFactor;
-        return rp.alpha > 0;
-    });
-    surfaceWaves = surfaceWaves.filter(w => {
-        w.elapsed += dt;
-        w.amp     *= Math.pow(0.88, dtFactor);
-        return w.amp > 0.10;
-    });
-}
-
-function drawSurface() {
-    const surfaceY = getSurfaceY();
-    // チャンバー内部の左右端（画像幅に対する割合）
-    const clipLeft  = canvasW * 0.32;
-    const clipRight = canvasW * 0.68;
-    const clipTop   = canvasH * 0.33;
-    const clipBot   = canvasH * 0.88;
-
-    const steps = 40;
-    const pts = [];
-    for (let i = 0; i <= steps; i++) {
-        const px = clipLeft + ((clipRight - clipLeft) / steps) * i;
-        let py = surfaceY;
-        surfaceWaves.forEach(sw => {
-            const dist = px - sw.x;
-            const t = sw.elapsed / 1000;
-            py += sw.amp * Math.sin((dist / 16) - t * 18) *
-                  Math.exp(-dist * dist / (canvasW * canvasW * 0.4));
-        });
-        pts.push({ px, py });
+    function initCanvas() {
+        canvasW = chamberImg.offsetWidth;
+        canvasH = chamberImg.offsetHeight;
+        canvas.width  = canvasW;
+        canvas.height = canvasH;
+        canvas.style.width  = canvasW + 'px';
+        canvas.style.height = canvasH + 'px';
+        tipX = canvasW * cfg.tip.x;
+        tipY = canvasH * cfg.tip.y;
     }
 
-    ctx.save();
-    // チャンバー内部のみ描画
-    ctx.beginPath();
-    ctx.rect(clipLeft, clipTop, clipRight - clipLeft, clipBot - clipTop);
-    ctx.clip();
+    function getSurfaceY() {
+        return canvasH * cfg.surfaceY;
+    }
 
-    ripples.forEach(rp => {
+    function spawnDrop() {
+        drops.push({
+            phase: 'grow',
+            x: tipX,
+            y: tipY + cfg.spawnOffsetY,
+            vy: 0,
+            elapsed: 0,   // フェーズ内の経過ms
+        });
+    }
+
+    function updateDrops(dt) {
+        const surfaceY = getSurfaceY();
+        // 物理: 60fps基準で正規化
+        const dtFactor = dt / (1000 / 60);
+
+        drops = drops.filter(d => {
+            d.elapsed += dt;
+
+            if (d.phase === 'grow') {
+                if (d.elapsed >= GROW_MS) {
+                    d.phase   = 'fall';
+                    d.elapsed = 0;
+                    d.vy      = 1.8;
+                }
+
+            } else if (d.phase === 'fall') {
+                d.vy += 0.32 * dtFactor;
+                d.y  += d.vy * dtFactor;
+                const splashThreshold = surfaceY - cfg.dropSize.splash.h * 0.3;
+                if (d.y >= splashThreshold) {
+                    d.phase   = 'splash';
+                    d.y       = surfaceY;
+                    d.elapsed = 0;
+                    ripples.push({ x: d.x, y: surfaceY, r: cfg.ripple.r, maxR: cfg.ripple.maxR, alpha: cfg.ripple.alpha });
+                    surfaceWaves.push({ x: d.x, amp: cfg.wave.amp, elapsed: 0 });
+                    // 着水タイミングで音を鳴らす
+                    if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
+                }
+
+            } else if (d.phase === 'splash') {
+                if (d.elapsed >= SPLASH_MS) return false;
+            }
+            return true;
+        });
+    }
+
+    function updateRipples(dt) {
+        const dtFactor = dt / (1000 / 60);
+        ripples = ripples.filter(rp => {
+            rp.r     += (rp.maxR - rp.r) * 0.10 * dtFactor;
+            rp.alpha -= 0.018 * dtFactor;
+            return rp.alpha > 0;
+        });
+        surfaceWaves = surfaceWaves.filter(w => {
+            w.elapsed += dt;
+            w.amp     *= Math.pow(0.88, dtFactor);
+            return w.amp > 0.10;
+        });
+    }
+
+    function drawSurface() {
+        const surfaceY = getSurfaceY();
+        // チャンバー内部の範囲
+        const clipLeft  = canvasW * cfg.clip.left;
+        const clipRight = canvasW * cfg.clip.right;
+        const clipTop   = canvasH * cfg.clip.top;
+        const clipBot   = canvasH * cfg.clip.bot;
+
+        const steps = 40;
+        const pts = [];
+        for (let i = 0; i <= steps; i++) {
+            const px = clipLeft + ((clipRight - clipLeft) / steps) * i;
+            let py = surfaceY;
+            surfaceWaves.forEach(sw => {
+                const dist = px - sw.x;
+                const tSec = sw.elapsed / 1000;
+                py += sw.amp * Math.sin((dist / cfg.wave.wavelength) - tSec * 18) *
+                      Math.exp(-dist * dist / (canvasW * canvasW * 0.4));
+            });
+            pts.push({ px, py });
+        }
+
+        ctx.save();
+        // チャンバー内部のみ描画
         ctx.beginPath();
-        ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.28, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(180,180,180,${rp.alpha})`;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-    });
-    ctx.beginPath();
-    ctx.moveTo(pts[0].px, pts[0].py);
-    pts.forEach(p => ctx.lineTo(p.px, p.py));
-    ctx.strokeStyle = 'rgba(180,180,180,0.45)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+        ctx.rect(clipLeft, clipTop, clipRight - clipLeft, clipBot - clipTop);
+        ctx.clip();
 
-    ctx.restore();
-}
-
-function drawDrops() {
-    drops.forEach(d => {
-        if (d.phase === 'grow') {
-            // tekika1: 成長アニメーション（徐々に拡大）
-            const progress = Math.min(d.elapsed / PHASE_MS.grow, 1);
-            const sw = DROP_SIZE.grow.w * progress;
-            const sh = DROP_SIZE.grow.h * progress;
-            const img = dropImgs[0];
-            if (img && img.complete && sw > 0) {
-                ctx.drawImage(img, tipX - sw / 2 - 1, tipY, sw, sh);
-            }
-
-        } else if (d.phase === 'fall') {
-            // tekika3: 落下中・速度に応じて縦方向にわずかに伸びる
-            const stretch = Math.min(1 + d.vy * 0.022, 1.25);
-            const sw = DROP_SIZE.fall.w;
-            const sh = DROP_SIZE.fall.h * stretch;
-            const img = dropImgs[2];
-            if (img && img.complete) {
-                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-            }
-
-        } else if (d.phase === 'splash') {
-            // tekika4: 着水・フェードアウト
-            const alpha = 1 - d.elapsed / SPLASH_MS;
-            const sw = DROP_SIZE.splash.w;
-            const sh = DROP_SIZE.splash.h;
-            const img = dropImgs[3];
-            if (img && img.complete) {
-                ctx.save();
-                ctx.globalAlpha = Math.max(alpha, 0);
-                ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-                ctx.restore();
-            }
-        }
-    });
-}
-
-function renderFrame(timestamp) {
-    if (!lastTime) lastTime = timestamp;
-    const dt = Math.min(timestamp - lastTime, 50); // 最大50ms（タブ非表示復帰対策）
-    lastTime = timestamp;
-
-    ctx.clearRect(0, 0, canvasW, canvasH);
-    updateDrops(dt);
-    updateRipples(dt);
-    drawSurface();
-    drawDrops();
-    animFrameId = requestAnimationFrame(renderFrame);
-}
-
-function startDropAnimation(intervalSec) {
-    stopDropAnimation();
-    const doStart = () => {
-        initCanvas();
-        drops = []; ripples = []; surfaceWaves = [];
-        lastTime = null;
-        renderFrame(performance.now());
-        spawnDrop();
-        dropIntervalId = setInterval(spawnDrop, intervalSec * 1000);
-    };
-    if (chamberImg.complete && chamberImg.naturalWidth > 0) {
-        doStart();
-    } else {
-        chamberImg.onload = doStart;
-    }
-}
-
-function stopDropAnimation() {
-    if (animFrameId)    { cancelAnimationFrame(animFrameId); animFrameId = null; }
-    if (dropIntervalId) { clearInterval(dropIntervalId); dropIntervalId = null; }
-    drops = []; ripples = []; surfaceWaves = [];
-    lastTime = null;
-    if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
-}
-
-// ============================================================
-// 小児用Canvas滴下アニメーション（成人用と独立）
-// ============================================================
-const canvasC      = document.getElementById('dropCanvasChild');
-const ctxC         = canvasC.getContext('2d');
-const chamberImgC  = document.getElementById('chamberImgChild');
-
-// sixyouni_tekika.PNG: 針先は幅50%・高さ約36%、液面約60%
-const CHILD_TIP_RATIO    = { x: 0.50, y: 0.227 };
-const CHILD_SURFACE_Y    = 0.585;
-const CHILD_CLIP = { left: 0.32, right: 0.69, top: 0.36, bot: 0.88 };
-const CHILD_DROP_SIZE = {
-    grow:   { w: 8, h: 6  },
-    fall:   { w: 13, h: 13 },
-    splash: { w: 18, h: 11 },
-};
-
-let cAnimFrameId    = null;
-let cDropIntervalId = null;
-let cLastTime       = null;
-let cDrops          = [];
-let cRipples        = [];
-let cSurfaceWaves   = [];
-let cCanvasW = 0, cCanvasH = 0;
-let cTipX = 0, cTipY = 0;
-
-function initCanvasC() {
-    cCanvasW = chamberImgC.offsetWidth;
-    cCanvasH = chamberImgC.offsetHeight;
-    canvasC.width  = cCanvasW;
-    canvasC.height = cCanvasH;
-    canvasC.style.width  = cCanvasW + 'px';
-    canvasC.style.height = cCanvasH + 'px';
-    cTipX = cCanvasW * CHILD_TIP_RATIO.x;
-    cTipY = cCanvasH * CHILD_TIP_RATIO.y;
-}
-
-function getSurfaceYC() { return cCanvasH * CHILD_SURFACE_Y; }
-
-function spawnDropC() {
-    cDrops.push({ phase: 'grow', x: cTipX, y: cTipY, vy: 0, elapsed: 0 });
-}
-
-function updateDropsC(dt) {
-    const surfaceY = getSurfaceYC();
-    const dtF = dt / (1000 / 60);
-    cDrops = cDrops.filter(d => {
-        d.elapsed += dt;
-        if (d.phase === 'grow') {
-            if (d.elapsed >= 480) { d.phase = 'fall'; d.elapsed = 0; d.vy = 1.8; }
-        } else if (d.phase === 'fall') {
-            d.vy += 0.32 * dtF;
-            d.y  += d.vy * dtF;
-            if (d.y >= surfaceY - CHILD_DROP_SIZE.splash.h * 0.3) {
-                d.phase = 'splash'; d.y = surfaceY; d.elapsed = 0;
-                cRipples.push({ x: d.x, y: surfaceY, r: 2, maxR: 18, alpha: 0.60 });
-                cSurfaceWaves.push({ x: d.x, amp: 2.5, elapsed: 0 });
-                if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime);
-            }
-        } else if (d.phase === 'splash') {
-            if (d.elapsed >= 220) return false;
-        }
-        return true;
-    });
-}
-
-function updateRipplesC(dt) {
-    const dtF = dt / (1000 / 60);
-    cRipples = cRipples.filter(rp => {
-        rp.r     += (rp.maxR - rp.r) * 0.10 * dtF;
-        rp.alpha -= 0.018 * dtF;
-        return rp.alpha > 0;
-    });
-    cSurfaceWaves = cSurfaceWaves.filter(w => {
-        w.elapsed += dt;
-        w.amp     *= Math.pow(0.88, dtF);
-        return w.amp > 0.10;
-    });
-}
-
-function drawSurfaceC() {
-    const surfaceY = getSurfaceYC();
-    const clipL = cCanvasW * CHILD_CLIP.left;
-    const clipR = cCanvasW * CHILD_CLIP.right;
-    const clipT = cCanvasH * CHILD_CLIP.top;
-    const clipB = cCanvasH * CHILD_CLIP.bot;
-    const steps = 40;
-    const pts = [];
-    for (let i = 0; i <= steps; i++) {
-        const px = clipL + ((clipR - clipL) / steps) * i;
-        let py = surfaceY;
-        cSurfaceWaves.forEach(sw => {
-            const dist = px - sw.x;
-            const t = sw.elapsed / 1000;
-            py += sw.amp * Math.sin((dist / 14) - t * 18) *
-                  Math.exp(-dist * dist / (cCanvasW * cCanvasW * 0.4));
+        ripples.forEach(rp => {
+            ctx.beginPath();
+            ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.28, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(180,180,180,${rp.alpha})`;
+            ctx.lineWidth = cfg.ripple.lineWidth;
+            ctx.stroke();
         });
-        pts.push({ px, py });
+        ctx.beginPath();
+        ctx.moveTo(pts[0].px, pts[0].py);
+        pts.forEach(p => ctx.lineTo(p.px, p.py));
+        ctx.strokeStyle = 'rgba(180,180,180,0.45)';
+        ctx.lineWidth = cfg.surfaceLineWidth;
+        ctx.stroke();
+
+        ctx.restore();
     }
-    ctxC.save();
-    ctxC.beginPath();
-    ctxC.rect(clipL, clipT, clipR - clipL, clipB - clipT);
-    ctxC.clip();
-    cRipples.forEach(rp => {
-        ctxC.beginPath();
-        ctxC.ellipse(rp.x, rp.y, rp.r, rp.r * 0.28, 0, 0, Math.PI * 2);
-        ctxC.strokeStyle = `rgba(180,180,180,${rp.alpha})`;
-        ctxC.lineWidth = 1.0;
-        ctxC.stroke();
-    });
-    ctxC.beginPath();
-    ctxC.moveTo(pts[0].px, pts[0].py);
-    pts.forEach(p => ctxC.lineTo(p.px, p.py));
-    ctxC.strokeStyle = 'rgba(180,180,180,0.45)';
-    ctxC.lineWidth = 1.2;
-    ctxC.stroke();
-    ctxC.restore();
-}
 
-function drawDropsC() {
-    cDrops.forEach(d => {
-        if (d.phase === 'grow') {
-            const progress = Math.min(d.elapsed / 480, 1);
-            const sw = CHILD_DROP_SIZE.grow.w * progress;
-            const sh = CHILD_DROP_SIZE.grow.h * progress;
-            const img = dropImgs[0];
-            if (img && img.complete && sw > 0)
-                ctxC.drawImage(img, cTipX - sw / 2 - 1, cTipY, sw, sh);
-        } else if (d.phase === 'fall') {
-            const stretch = Math.min(1 + d.vy * 0.022, 1.25);
-            const sw = CHILD_DROP_SIZE.fall.w;
-            const sh = CHILD_DROP_SIZE.fall.h * stretch;
-            const img = dropImgs[2];
-            if (img && img.complete)
-                ctxC.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-        } else if (d.phase === 'splash') {
-            const alpha = Math.max(1 - d.elapsed / 220, 0);
-            const sw = CHILD_DROP_SIZE.splash.w;
-            const sh = CHILD_DROP_SIZE.splash.h;
-            const img = dropImgs[3];
-            if (img && img.complete) {
-                ctxC.save();
-                ctxC.globalAlpha = alpha;
-                ctxC.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
-                ctxC.restore();
+    function drawDrops() {
+        const size = cfg.dropSize;
+        drops.forEach(d => {
+            if (d.phase === 'grow') {
+                // tekika1: 成長アニメーション（徐々に拡大）
+                const progress = Math.min(d.elapsed / GROW_MS, 1);
+                const sw = size.grow.w * progress;
+                const sh = size.grow.h * progress;
+                const img = dropImgs[0];
+                if (img && img.complete && sw > 0) {
+                    ctx.drawImage(img, tipX - sw / 2 - 1, tipY, sw, sh);
+                }
+
+            } else if (d.phase === 'fall') {
+                // tekika3: 落下中・速度に応じて縦方向にわずかに伸びる
+                const stretch = Math.min(1 + d.vy * 0.022, 1.25);
+                const sw = size.fall.w;
+                const sh = size.fall.h * stretch;
+                const img = dropImgs[2];
+                if (img && img.complete) {
+                    ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+                }
+
+            } else if (d.phase === 'splash') {
+                // tekika4: 着水・フェードアウト
+                const alpha = 1 - d.elapsed / SPLASH_MS;
+                const sw = size.splash.w;
+                const sh = size.splash.h;
+                const img = dropImgs[3];
+                if (img && img.complete) {
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(alpha, 0);
+                    ctx.drawImage(img, d.x - sw / 2, d.y - sh / 2, sw, sh);
+                    ctx.restore();
+                }
             }
-        }
-    });
-}
+        });
+    }
 
-function renderFrameC(timestamp) {
-    if (!cLastTime) cLastTime = timestamp;
-    const dt = Math.min(timestamp - cLastTime, 50);
-    cLastTime = timestamp;
-    ctxC.clearRect(0, 0, cCanvasW, cCanvasH);
-    updateDropsC(dt);
-    updateRipplesC(dt);
-    drawSurfaceC();
-    drawDropsC();
-    cAnimFrameId = requestAnimationFrame(renderFrameC);
-}
+    function renderFrame(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = Math.min(timestamp - lastTime, 50); // 最大50ms（タブ非表示復帰対策）
+        lastTime = timestamp;
 
-function startChildDropAnimation(intervalSec) {
-    stopChildDropAnimation();
-    // display:noneの状態ではoffsetWidth/Heightが0になるため
-    // 表示切り替え後にrequestAnimationFrameで1フレーム待ってからinit
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+        ctx.clearRect(0, 0, canvasW, canvasH);
+        updateDrops(dt);
+        updateRipples(dt);
+        drawSurface();
+        drawDrops();
+        animFrameId = requestAnimationFrame(renderFrame);
+    }
+
+    function start(intervalSec) {
+        stop();
+        afterFrames(cfg.initDelayFrames, () => {
             const doStart = () => {
-                initCanvasC();
-                cDrops = []; cRipples = []; cSurfaceWaves = [];
-                cLastTime = null;
-                renderFrameC(performance.now());
-                spawnDropC();
-                cDropIntervalId = setInterval(spawnDropC, intervalSec * 1000);
+                initCanvas();
+                drops = []; ripples = []; surfaceWaves = [];
+                lastTime = null;
+                renderFrame(performance.now());
+                spawnDrop();
+                dropIntervalId = setInterval(spawnDrop, intervalSec * 1000);
             };
-            if (chamberImgC.complete && chamberImgC.naturalWidth > 0) {
+            if (chamberImg.complete && chamberImg.naturalWidth > 0) {
                 doStart();
             } else {
-                chamberImgC.onload = doStart;
+                chamberImg.onload = doStart;
             }
         });
+    }
+
+    function stop() {
+        if (animFrameId)    { cancelAnimationFrame(animFrameId); animFrameId = null; }
+        if (dropIntervalId) { clearInterval(dropIntervalId); dropIntervalId = null; }
+        drops = []; ripples = []; surfaceWaves = [];
+        lastTime = null;
+        if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
+    }
+
+    return { start, stop };
+}
+
+// ============================================================
+// 結果画面のチャンバー（地域プロファイルの tubing[].chamber から生成）
+// ============================================================
+const chamberViews = {};   // チャンバーキー → { wrap, animator }
+
+function renderChambers() {
+    const area = document.getElementById('chamberArea');
+    region.tubing.forEach(tubing => {
+        const key = tubing.chamber;
+        if (chamberViews[key]) return;   // 複数のルートで同じチャンバーを共有する場合
+        const cfg = CHAMBERS[key];
+        const wrap = document.createElement('div');
+        wrap.className = 'chamber-wrap';
+        // 最初のチャンバー以外は非表示で用意しておく
+        if (Object.keys(chamberViews).length > 0) wrap.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = cfg.image;
+        img.className = 'chamber-img';
+        const canvas = document.createElement('canvas');
+        canvas.className = 'drop-canvas';
+        wrap.append(img, canvas);
+        area.appendChild(wrap);
+        chamberViews[key] = { wrap, animator: createDropAnimator(cfg, img, canvas) };
     });
 }
 
-function stopChildDropAnimation() {
-    if (cAnimFrameId)    { cancelAnimationFrame(cAnimFrameId); cAnimFrameId = null; }
-    if (cDropIntervalId) { clearInterval(cDropIntervalId); cDropIntervalId = null; }
-    cDrops = []; cRipples = []; cSurfaceWaves = [];
-    cLastTime = null;
-    if (cCanvasW > 0) ctxC.clearRect(0, 0, cCanvasW, cCanvasH);
-}
+renderChambers();
 
 // ============================================================
 // AdMob バナー広告（入力画面下部のみ・結果画面には表示しない）
