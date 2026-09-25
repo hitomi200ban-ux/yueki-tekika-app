@@ -1056,8 +1056,9 @@ h1 {
     margin-top: 2px;
 }
 
-/* スペイン語版だけ：microgotas/min が長くチャンバー画像に接するため小さくする（lang は applyStrings で設定） */
-html[lang="es"] .rn-unit {
+/* スペイン語版・ポルトガル語版だけ：microgotas/min が長くチャンバー画像に接するため小さくする（lang は applyStrings で設定） */
+html[lang="es"] .rn-unit,
+html[lang="pt-BR"] .rn-unit {
     font-size: 16px;
 }
 
@@ -1241,8 +1242,9 @@ html[lang="es"] .rn-unit {
     .rn-sec-unit {
         font-size: 16px;
     }
-    /* スペイン語版だけ：microgotas/min がチャンバー画像に接しないよう、さらに小さくする */
-    html[lang="es"] .rn-unit {
+    /* スペイン語版・ポルトガル語版だけ：microgotas/min がチャンバー画像に接しないよう、さらに小さくする */
+    html[lang="es"] .rn-unit,
+    html[lang="pt-BR"] .rn-unit {
         font-size: 14px;
     }
 }
