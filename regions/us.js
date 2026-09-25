@@ -1,6 +1,6 @@
 // ============================================================
 // 米国版プロファイル（US clinical practice に合わせた設定）
-// 重力滴下の計算（gtt/min）のみ。輸液ポンプ（mL/hr）の計算は扱わない
+// 重力滴下の計算（drops/min）のみ。輸液ポンプ（mL/hr）の計算は扱わない
 // ============================================================
 window.REGIONS = window.REGIONS || {};
 
@@ -10,7 +10,7 @@ REGIONS['US'] = {
     // 端末の言語がこれで始まるときにこの地域を選ぶ
     languages: ['en'],
     // 地域切替で表示する名前（その地域の言葉で）
-    nativeName: 'United States',
+    nativeName: 'English',
     languageName: 'English',
     privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/en.html',
     // 入力画面に表示する免責文（i18n のキー）

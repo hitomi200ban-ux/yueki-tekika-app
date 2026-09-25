@@ -1,6 +1,6 @@
 // ============================================================
 // 英語（米国）の文言辞書
-// 米国の看護・臨床教育で一般的な表記（gtt/mL, gtt/min, hr, min）に合わせる
+// 英語圏共通の英語版（国ごとではなく言語ごとに1つ）。表記は gtt/mL, drops/min, hr, min
 // 単位の前のスペースは表示上必要なもの（flex 内は \u00a0 を使う）
 // ============================================================
 window.STRINGS = window.STRINGS || {};
@@ -22,7 +22,7 @@ STRINGS['en-US'] = {
     'volume.manualEmpty':   'Not entered',
 
     // 入力画面：輸液ルート
-    'tubing.label':         'IV tubing',
+    'tubing.label':         'IV tubing (giving set)',
     'tubing.hint':          'Select drop factor',
     'tubing.macro':         'Macrodrip',
     'tubing.macroSub':      '10 / 15 / 20 gtt/mL',
@@ -51,15 +51,15 @@ STRINGS['en-US'] = {
     'privacy':              'Privacy Policy',
 
     // 地域切替
-    'region.current':       '🌐 Region: {name}',
-    'region.title':         'Choose your region',
-    'region.note':          'Drop factors and units follow clinical practice in the selected region.',
+    'region.current':       '🌐 Language: {name}',
+    'region.title':         'Choose your language',
+    'region.note':          'Drop factors and units are shown in the style commonly used with this language.',
     'region.cancel':        'Cancel',
-    'disclaimer':           'For educational and reference use only. Always verify calculations and follow your facility\'s policies and procedures.',
+    'disclaimer':           'For educational and reference use only. Always verify calculations and follow your local policies and procedures.',
 
     // 結果画面
     'result.rateLabel':     'Drip rate',
-    'result.rateUnit':      'gtt/min',
+    'result.rateUnit':      'drops/min',
     'result.intervalLabel': '1 drop every',
     'result.intervalUnit':  'seconds',
     'result.formulaToggle': 'Formula',
@@ -74,7 +74,7 @@ STRINGS['en-US'] = {
     'formula.minute':       ' min',
     'formula.parenOpen':    '(',
     'formula.parenClose':   ' min)',
-    'formula.resultUnit':   '\u00a0gtt/min',
+    'formula.resultUnit':   '\u00a0drops/min',
 
     // アラート
     'alert.invalidManual':  'Enter a valid number.',
