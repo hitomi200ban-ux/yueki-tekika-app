@@ -13,8 +13,7 @@ REGIONS['ES'] = {
     // 地域切替で表示する名前（その地域の言葉で）
     nativeName: 'Español',
     languageName: 'Español',
-    // スペイン語のポリシーを公開するまでは英語版を表示する
-    privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/en.html',
+    privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/es.html',
     // 入力画面に表示する免責文（i18n のキー）
     disclaimerKey: 'disclaimer',
 
