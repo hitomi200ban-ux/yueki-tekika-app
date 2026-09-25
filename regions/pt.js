@@ -1,7 +1,7 @@
 // ============================================================
 // ポルトガル語版プロファイル（ブラジル式 pt-BR を基準にした1版）
 // 重力滴下の計算（gotas/min・microgotas/min）のみ。輸液ポンプ（mL/h）の計算は扱わない
-// 画像とチャンバーは英語版と共通（画像に文字は mL だけ）
+// チャンバー画像は英語版と共通。輸液バッグ画像だけブラジル版専用（img/br）
 // ============================================================
 window.REGIONS = window.REGIONS || {};
 
@@ -17,13 +17,12 @@ REGIONS['PT'] = {
     // 入力画面に表示する免責文（i18n のキー）
     disclaimerKey: 'disclaimer',
 
-    // 輸液量プリセット
+    // 輸液量プリセット（バッグ画像はブラジル版専用。50 mL はブラジルで一般的な製品が見当たらないため置かない＝Outro volume で入力）
     volumes: [
-        { ml: 1000, image: './img/us/bag_1000ml.png' },
-        { ml: 500,  image: './img/us/bag_500ml.png' },
-        { ml: 250,  image: './img/us/bag_250ml.png' },
-        { ml: 100,  image: './img/us/bag_100ml.png' },
-        { ml: 50,   image: './img/us/bag_50ml.png' },
+        { ml: 1000, image: './img/br/bag_1000ml.png' },
+        { ml: 500,  image: './img/br/bag_500ml.png' },
+        { ml: 250,  image: './img/br/bag_250ml.png' },
+        { ml: 100,  image: './img/br/bag_100ml.png' },
     ],
     initialVolumeIndex: 1,
 
