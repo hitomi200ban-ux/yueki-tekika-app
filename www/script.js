@@ -218,6 +218,34 @@ function updateSummary() {
     document.getElementById('summaryHour').textContent = h;
     document.getElementById('summaryMin').textContent = String(m).padStart(2, '0');
     document.getElementById('summaryTotalMin').textContent = totalMin;
+    applyUnitStrings();
+}
+
+// ============================================================
+// 単位の文言（ルートごとの差し替え）
+// 地域プロファイルの tubing[].units に「既定のキー → 使うキー」があるルートだけ差し替える
+// （スペイン語版の Microgotero → microgotas など）。差し替えのないルートは既定の文言のまま
+// ============================================================
+const UNIT_STRING_KEYS = [
+    'summary.dropUnit',
+    'formula.dropUnit',
+    'formula.resultUnit',
+    'result.rateUnit',
+    'result.intervalLabel',
+];
+
+function unitKey(key) {
+    const units = selectedTubing && selectedTubing.units;
+    return (units && units[key]) || key;
+}
+
+// ルートを選び直したときに前のルートの単位が残らないよう、毎回すべて書き直す
+function applyUnitStrings() {
+    UNIT_STRING_KEYS.forEach(key => {
+        document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => {
+            el.textContent = t(unitKey(key));
+        });
+    });
 }
 
 // ============================================================
