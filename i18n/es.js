@@ -21,7 +21,7 @@ STRINGS['es'] = {
     'volume.manualConfirm': 'Aceptar',
     'volume.none':          'Sin seleccionar',
     'volume.selected':      '{v} mL seleccionados',
-    'volume.manualEmpty':   'Sin valor',
+    'volume.manualEmpty':   'Sin especificar',
 
     // 入力画面：輸液ルート
     'tubing.label':         'Equipo de infusión',
@@ -56,7 +56,7 @@ STRINGS['es'] = {
     // 言語切替
     'region.current':       '🌐 Idioma: {name}',
     'region.title':         'Elija su idioma',
-    'region.note':          'Los factores de goteo y las unidades se muestran según el uso habitual en este idioma.',
+    'region.note':          'Los factores de goteo y las unidades se adaptan a la práctica clínica habitual.',
     'region.cancel':        'Cancelar',
     'disclaimer':           'Solo para fines educativos y de referencia. Verifique siempre los cálculos y siga los protocolos de su institución.',
 
