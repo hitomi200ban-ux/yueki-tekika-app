@@ -71,6 +71,13 @@ h1 {
     font-weight: normal;
 }
 
+/* 日本語表示のサブタイトル：文字の途中では折り返さず、文言に入れた区切り（「向け」の後ろ）で折り返す。
+   「リ」だけが2行目に残らないようにするため。区切りでも収まらない狭い画面では、はみ出さずに途中で折り返す */
+:lang(ja) .app-subtitle {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+}
+
 /* 英語表示のサブタイトル：2行になるときは行の長さをそろえ、「&」だけが行末に残らないようにする */
 :lang(en) .app-subtitle {
     text-wrap: balance;

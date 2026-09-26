@@ -8,7 +8,8 @@ window.STRINGS = window.STRINGS || {};
 STRINGS['ja'] = {
     'doc.title':            '輸液滴下計算 | 看護師・看護学生向け点滴滴下計算アプリ',
     'app.title':            '輸液滴下計算',
-    'app.subtitle':         '看護師・看護学生向け点滴滴下計算アプリ',
+    // 2行になるときは「看護師・看護学生向け／点滴滴下計算アプリ」で折り返す（​ の位置。CSS の :lang(ja) .app-subtitle と組）
+    'app.subtitle':         '看護師・看護学生向け​点滴滴下計算アプリ',
     'common.decided':       '✓ 決定',
 
     // 入力画面：輸液量

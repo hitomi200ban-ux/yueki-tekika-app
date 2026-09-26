@@ -2,6 +2,10 @@
 // 地域・言語
 // 地域（臨床ルール）は regions/、文言は i18n/、チャンバー画像は chambers.js に置く
 // ============================================================
+// 読み込み直したとき（言語の切り替え）に前のスクロール位置を戻さない。
+// 戻すと一番下のまま開き、広告が出たときに免責文やボタンに重なるため、常に一番上から表示する
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 // どの地域の言語にも当てはまらないときの地域
 const DEFAULT_REGION_ID = 'US';
 // ユーザーが地域を選んだときの保存先
@@ -142,7 +146,10 @@ function switchRegion(regionId) {
     // ネイティブの広告バナーはページを読み込み直しても残り、読み込み後に表示されなくなるため、先に取り除く
     const AdMob = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob;
     const removed = AdMob ? AdMob.removeBanner().catch(() => {}) : Promise.resolve();
-    removed.then(() => location.reload());
+    removed.then(() => {
+        window.scrollTo(0, 0);
+        location.reload();
+    });
 }
 
 renderRegionSwitcher();
