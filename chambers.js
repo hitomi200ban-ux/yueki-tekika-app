@@ -80,4 +80,6 @@ CHAMBERS['usMicro'] = {
     wave: { amp: 2.5, wavelength: 14 },
     surfaceLineWidth: 1.2,
     initDelayFrames: 2,
+    // 着水の見た目より音が早く聞こえるため、音だけ遅らせる（ms）
+    soundDelayMs: 80,
 };
