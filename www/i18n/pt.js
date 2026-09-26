@@ -11,7 +11,7 @@ STRINGS['pt-BR'] = {
     'doc.title':            'Calculadora de Gotejamento IV | Cálculo de gotejamento para enfermagem',
     // 折り返すとき「IV」だけが2行目に残らないよう、Gotejamento と IV の間は改行しないスペース
     'app.title':            'Calculadora de Gotejamento\u00a0IV',
-    'app.subtitle':         'Cálculo de gotejamento para enfermagem',
+    'app.subtitle':         'Cálculo de gotejamento na enfermagem',
     'common.decided':       '✓ Selecionado',
 
     // 入力画面：輸液量
@@ -28,13 +28,11 @@ STRINGS['pt-BR'] = {
     'tubing.label':         'Equipo',
     'tubing.hint':          'Escolha o tipo de equipo',
     'tubing.macro':         'Macrogotas',
-    'tubing.macroSub':      '10 / 15 / 20 gotas/mL',
+    'tubing.macroSub':      '20 gotas/mL',
     'tubing.macroAlt':      'Equipo macrogotas',
     'tubing.micro':         'Microgotas',
     'tubing.microSub':      '60 microgotas/mL',
     'tubing.microAlt':      'Equipo microgotas',
-    'tubing.factorLabel':   'Gotas por mL',
-    'tubing.factorUnit':    'gotas/mL',
     'tubing.note':          'Confira o número de gotas/mL na embalagem do equipo.',
 
     // 入力画面：投与時間
@@ -89,6 +87,6 @@ STRINGS['pt-BR'] = {
     'alert.volumeNotSelected': 'Toque em uma bolsa para selecionar o volume.',
     'alert.volumeEmpty':    'Digite o volume e toque em OK.',
     'alert.tubing':         'Selecione o equipo.',
-    'alert.dropFactor':     'Selecione quantas gotas/mL tem o equipo (10, 15 ou 20).',
+    'alert.dropFactor':     'Selecione as gotas/mL do equipo.',
     'alert.time':           'Selecione o tempo de infusão.',
 };

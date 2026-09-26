@@ -16,6 +16,8 @@ REGIONS['PT'] = {
     privacyUrl: 'https://hitomi200ban-ux.github.io/privacy-policy-yueki/pt.html',
     // 入力画面に表示する免責文（i18n のキー）
     disclaimerKey: 'disclaimer',
+    // 結果の小数点はブラジル式のカンマ（2,4 / 24,7）
+    decimalSeparator: ',',
 
     // 輸液量プリセット（バッグ画像はブラジル版専用。50 mL はブラジルで一般的な製品が見当たらないため置かない＝Outro volume で入力）
     volumes: [
@@ -26,7 +28,8 @@ REGIONS['PT'] = {
     ],
     initialVolumeIndex: 1,
 
-    // Equipo（Macrogotas は 10/15/20 から選択、Microgotas は 60 固定）
+    // Equipo（ブラジルの規格 ABNT NBR ISO 8536-4 に合わせ、Macrogotas は 20・Microgotas は 60 で固定）
+    // 係数が1つだけなので、ルートを選ぶと係数も確定する（係数ボタンは出ない）
     tubing: [
         {
             id: 'macro',
@@ -34,7 +37,7 @@ REGIONS['PT'] = {
             labelKey: 'tubing.macro',
             subLabelKey: 'tubing.macroSub',
             altKey: 'tubing.macroAlt',
-            factors: [10, 15, 20],
+            factors: [20],
             chamber: 'usMacro',
             accentColor: '#66bb6a',
         },

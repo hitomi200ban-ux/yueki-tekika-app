@@ -169,6 +169,12 @@ function toFixed1(x) {
     return (Math.round(x * 10 + ROUND_EPSILON) / 10).toFixed(1);
 }
 
+// 表示用の小数（地域プロファイルに decimalSeparator があればその記号にする。例：pt-BR は 2,4）
+function formatDecimal1(x) {
+    const s = toFixed1(x);
+    return region.decimalSeparator ? s.replace('.', region.decimalSeparator) : s;
+}
+
 // ============================================================
 // 状態変数
 // ============================================================
@@ -511,8 +517,8 @@ calculateBtn.addEventListener('click', () => {
     const dropInterval = 60 / dropRate;
 
     const dropRateRound = roundHalfUp(dropRate);
-    const dropRateExact = toFixed1(dropRate);
-    const secPerDrop = toFixed1(60 / dropRate);
+    const dropRateExact = formatDecimal1(dropRate);
+    const secPerDrop = formatDecimal1(60 / dropRate);
 
     dropRateDisplay.textContent = dropRateRound;
     document.getElementById('dropRateExact').textContent = dropRateExact;
@@ -526,7 +532,7 @@ calculateBtn.addEventListener('click', () => {
     document.getElementById('fHour').textContent     = parseInt(hourSelect.value);
     document.getElementById('fMin').textContent      = String(parseInt(minuteSelect.value)).padStart(2, '0');
     document.getElementById('fTotalMin').textContent = Math.round(hours * 60);
-    document.getElementById('fExact').textContent    = toFixed1(dropRate);
+    document.getElementById('fExact').textContent    = formatDecimal1(dropRate);
     document.getElementById('fApprox').textContent   = roundHalfUp(dropRate);
     inputScreen.classList.remove('active');
     resultScreen.classList.add('active');
