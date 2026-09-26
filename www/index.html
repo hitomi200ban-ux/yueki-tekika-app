@@ -93,10 +93,12 @@
             <!-- 免責表示（地域プロファイルに disclaimerKey がある地域だけ表示） -->
             <p class="disclaimer" id="disclaimer" hidden></p>
 
-            <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link" id="privacyLink" data-i18n="privacy">プライバシーポリシー</a>
-
-            <!-- 地域切替（文言は script.js で設定） -->
-            <button type="button" id="regionLink" class="region-link"></button>
+            <!-- プライバシーポリシーと地域切替は横に並べる（縦に並べると広告に近く、押し間違えやすいため） -->
+            <div class="footer-links" id="footerLinks">
+                <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link" id="privacyLink" data-i18n="privacy">プライバシーポリシー</a>
+                <!-- 地域切替（文言は script.js で設定） -->
+                <button type="button" id="regionLink" class="region-link"></button>
+            </div>
 
             <div id="bannerAdSpace" class="banner-ad-space"></div>
         </div>

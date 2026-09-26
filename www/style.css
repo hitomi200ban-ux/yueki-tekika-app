@@ -565,21 +565,34 @@ h1 {
     text-align: center;
 }
 
+/* プライバシーポリシーと地域切替（横並び。狭い画面では折り返す） */
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    column-gap: 16px;
+    margin-top: 4px;
+}
+
 .privacy-link {
-    display: block;
-    text-align: center;
-    margin-top: 3px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 8px;
     font-size: 11px;
     color: #b0bec5;
     text-decoration: underline;
     -webkit-tap-highlight-color: transparent;
 }
 
-/* 地域切替のリンク（プライバシーポリシーの下） */
+/* 地域切替のリンク（プライバシーポリシーの右） */
 .region-link {
-    display: block;
-    margin: 6px auto 0;
-    padding: 4px 8px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    margin: 0;
+    padding: 0 8px;
     border: none;
     background: none;
     font-size: 11px;

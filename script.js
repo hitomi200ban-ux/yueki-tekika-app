@@ -1037,7 +1037,7 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4905596514841693/1496836491';
         if (!space) return;
         if (heightPx <= 0) { space.style.height = '0'; return; }
 
-        const lastControl = onResult ? backBtn : document.getElementById('regionLink');
+        const lastControl = onResult ? backBtn : document.getElementById('footerLinks');
         // 一番下のボタンの下端からページの末尾までのうち、広告枠以外の部分（body の余白など）
         const controlBottom = layoutBottom(lastControl);
         const tail = document.documentElement.scrollHeight - controlBottom - space.offsetHeight;
