@@ -20,6 +20,8 @@ CHAMBERS['jpAdult'] = {
     wave: { amp: 3.5, wavelength: 16 },
     surfaceLineWidth: 1.5,
     initDelayFrames: 0,
+    // 着水の見た目より音が早く聞こえるため、音だけ遅らせる（ms）
+    soundDelayMs: 160,
 };
 
 // 小児用（sixyouni_tekika.PNG）
@@ -39,6 +41,8 @@ CHAMBERS['jpChild'] = {
     surfaceLineWidth: 1.2,
     // 表示切り替え直後は offsetWidth/Height が取れないことがあるため2フレーム待ってから初期化
     initDelayFrames: 2,
+    // 着水の見た目より音が早く聞こえるため、音だけ遅らせる（ms）
+    soundDelayMs: 200,
 };
 
 // US版 Macrodrip（macrodrip_result.png）
