@@ -594,6 +594,9 @@ function getAudioCtx() {
     return audioCtx;
 }
 
+// 先に予約した音（戻る・音OFFのときに止める）
+const pendingTicks = [];
+
 function scheduleTick(ac, when) {
     const osc  = ac.createOscillator();
     const gain = ac.createGain();
@@ -606,6 +609,17 @@ function scheduleTick(ac, when) {
     gain.gain.exponentialRampToValueAtTime(0.001, when + 0.06);
     osc.start(when);
     osc.stop(when + 0.06);
+    pendingTicks.push(osc);
+    osc.onended = () => {
+        const i = pendingTicks.indexOf(osc);
+        if (i >= 0) pendingTicks.splice(i, 1);
+    };
+}
+
+function cancelPendingTicks() {
+    pendingTicks.splice(0).forEach(osc => {
+        try { osc.stop(); } catch (e) { /* 既に止まっている */ }
+    });
 }
 
 function startTickSound(intervalSec) {
@@ -615,7 +629,8 @@ function startTickSound(intervalSec) {
 }
 
 function stopTickSound() {
-    // 着水イベント駆動のため特に停止処理不要
+    // 音はアニメーション側で少し先まで予約しているので、まだ鳴っていない分を取り消す
+    cancelPendingTicks();
 }
 
 soundBtn.addEventListener('click', () => {
@@ -647,6 +662,28 @@ const dropImgs = [null, null, null, null];
 const GROW_MS = 480;
 // 着水フェード時間（ms）
 const SPLASH_MS = 220;
+// 落下の計算の基準（60fps の1フレーム）
+const FRAME_MS = 1000 / 60;
+// 音を何ms先まで予約しておくか（画面の描き直しが一瞬止まってもリズムが崩れないように）
+const SOUND_LOOKAHEAD_MS = 250;
+// これより遅れた音は鳴らさずに飛ばす（遅れた音をまとめて鳴らすとリズムが崩れるため）
+const SOUND_LATE_MS = 30;
+
+// 落下開始から f フレーム後の移動量（px）。
+// 1フレームごとに「速度 += 0.32、位置 += 速度」（初速 1.8）と進めた場合と同じ値になる式
+function fallDistance(f) {
+    return 1.96 * f + 0.16 * f * f;
+}
+
+// 落下開始から f フレーム後の速度（水滴の縦の伸びに使う）
+function fallVelocity(f) {
+    return 1.8 + 0.32 * f;
+}
+
+// 距離 distance を落ちるのにかかるフレーム数（fallDistance の逆算）
+function fallFrames(distance) {
+    return (-1.96 + Math.sqrt(1.96 * 1.96 + 0.64 * Math.max(distance, 0))) / 0.32;
+}
 
 // n フレーム待ってから fn を実行する（0 なら即実行）
 function afterFrames(n, fn) {
@@ -659,12 +696,19 @@ function createDropAnimator(cfg, chamberImg, canvas) {
     const ctx = canvas.getContext('2d');
 
     let tipX = 0, tipY = 0, canvasW = 0, canvasH = 0;
-    let animFrameId    = null;
-    let dropIntervalId = null;
-    let lastTime       = null;
-    let drops          = [];
-    let ripples        = [];
-    let surfaceWaves   = [];
+    let animFrameId     = null;
+    let soundTimerId    = null;
+    let lastTime        = null;
+    let drops           = [];
+    let ripples         = [];
+    let surfaceWaves    = [];
+    // 滴下の時刻表：k 滴目は startTime + k × intervalMs に出はじめる。
+    // タイマーで1滴ずつ作るのではなく時刻から計算するので、描き直しが遅れてもずれがたまらない
+    let startTime       = 0;
+    let intervalMs      = 1000;
+    let fallMs          = 0;    // 落下にかかる時間
+    let lastSplashIndex = -1;   // 波紋を出し終えた最後の水滴
+    let nextSoundIndex  = 0;    // 次に音を予約する水滴
 
     function initCanvas() {
         canvasW = chamberImg.offsetWidth;
@@ -681,50 +725,62 @@ function createDropAnimator(cfg, chamberImg, canvas) {
         return canvasH * cfg.surfaceY;
     }
 
-    function spawnDrop() {
-        drops.push({
-            phase: 'grow',
-            x: tipX,
-            y: tipY + cfg.spawnOffsetY,
-            vy: 0,
-            elapsed: 0,   // フェーズ内の経過ms
-        });
+    // 落下にかかる時間を求める（キャンバスの大きさが決まってから）
+    function computeFallMs() {
+        const startY = tipY + cfg.spawnOffsetY;
+        const splashThreshold = getSurfaceY() - cfg.dropSize.splash.h * 0.3;
+        fallMs = fallFrames(splashThreshold - startY) * FRAME_MS;
     }
 
-    function updateDrops(dt) {
+    // k 滴目が水面に着く時刻
+    function splashTimeOf(k) {
+        return startTime + k * intervalMs + GROW_MS + fallMs;
+    }
+
+    // 時刻 now に見えている水滴を、時刻表から計算して並べる
+    function updateDrops(now) {
         const surfaceY = getSurfaceY();
-        // 物理: 60fps基準で正規化
-        const dtFactor = dt / (1000 / 60);
+        const startY   = tipY + cfg.spawnOffsetY;
+        const lifeMs   = GROW_MS + fallMs + SPLASH_MS;
+        const first = Math.max(0, Math.ceil((now - startTime - lifeMs) / intervalMs));
+        const last  = Math.floor((now - startTime) / intervalMs);
+        // 描き直しが長く止まっている間に消えた水滴の波紋は出さない
+        lastSplashIndex = Math.max(lastSplashIndex, first - 1);
 
-        drops = drops.filter(d => {
-            d.elapsed += dt;
-
-            if (d.phase === 'grow') {
-                if (d.elapsed >= GROW_MS) {
-                    d.phase   = 'fall';
-                    d.elapsed = 0;
-                    d.vy      = 1.8;
+        drops = [];
+        for (let k = first; k <= last; k++) {
+            const age = now - (startTime + k * intervalMs);
+            if (age < GROW_MS) {
+                drops.push({ phase: 'grow', x: tipX, y: startY, vy: 0, elapsed: age });
+            } else if (age < GROW_MS + fallMs) {
+                const f = (age - GROW_MS) / FRAME_MS;
+                drops.push({ phase: 'fall', x: tipX, y: startY + fallDistance(f), vy: fallVelocity(f), elapsed: age - GROW_MS });
+            } else {
+                drops.push({ phase: 'splash', x: tipX, y: surfaceY, vy: 0, elapsed: age - GROW_MS - fallMs });
+                if (k > lastSplashIndex) {
+                    lastSplashIndex = k;
+                    ripples.push({ x: tipX, y: surfaceY, r: cfg.ripple.r, maxR: cfg.ripple.maxR, alpha: cfg.ripple.alpha });
+                    surfaceWaves.push({ x: tipX, amp: cfg.wave.amp, elapsed: 0 });
                 }
-
-            } else if (d.phase === 'fall') {
-                d.vy += 0.32 * dtFactor;
-                d.y  += d.vy * dtFactor;
-                const splashThreshold = surfaceY - cfg.dropSize.splash.h * 0.3;
-                if (d.y >= splashThreshold) {
-                    d.phase   = 'splash';
-                    d.y       = surfaceY;
-                    d.elapsed = 0;
-                    ripples.push({ x: d.x, y: surfaceY, r: cfg.ripple.r, maxR: cfg.ripple.maxR, alpha: cfg.ripple.alpha });
-                    surfaceWaves.push({ x: d.x, amp: cfg.wave.amp, elapsed: 0 });
-                    // 着水タイミングで音を鳴らす（見た目と合わせるため、チャンバーごとに遅らせられる）
-                    if (soundOn && audioCtx) scheduleTick(audioCtx, audioCtx.currentTime + (cfg.soundDelayMs || 0) / 1000);
-                }
-
-            } else if (d.phase === 'splash') {
-                if (d.elapsed >= SPLASH_MS) return false;
             }
-            return true;
-        });
+        }
+    }
+
+    // 着水の音を少し先まで予約する。音は AudioContext の時計で鳴るので、
+    // 画面の描き直しが一瞬止まっても一定のリズムで鳴る
+    function scheduleSounds() {
+        const now = performance.now();
+        // 見た目と合わせるため、チャンバーごとに音を遅らせる（soundDelayMs）。
+        // 着水の絵は着水時刻の次のフレームで出るので、その平均（半フレーム）も足す
+        const delayMs = (cfg.soundDelayMs || 0) + FRAME_MS / 2;
+        const soundTimeOf = k => splashTimeOf(k) + delayMs;
+        while (soundTimeOf(nextSoundIndex) < now - SOUND_LATE_MS) nextSoundIndex++;
+        if (!soundOn || !audioCtx) return;
+        while (soundTimeOf(nextSoundIndex) <= now + SOUND_LOOKAHEAD_MS) {
+            const waitMs = Math.max(0, soundTimeOf(nextSoundIndex) - now);
+            scheduleTick(audioCtx, audioCtx.currentTime + waitMs / 1000);
+            nextSoundIndex++;
+        }
     }
 
     function updateRipples(dt) {
@@ -827,12 +883,13 @@ function createDropAnimator(cfg, chamberImg, canvas) {
 
     function renderFrame(timestamp) {
         if (!lastTime) lastTime = timestamp;
-        const dt = Math.min(timestamp - lastTime, 50); // 最大50ms（タブ非表示復帰対策）
+        const dt = Math.min(timestamp - lastTime, 50); // 波紋用。最大50ms（タブ非表示復帰対策）
         lastTime = timestamp;
 
         ctx.clearRect(0, 0, canvasW, canvasH);
-        updateDrops(dt);
+        updateDrops(timestamp);
         updateRipples(dt);
+        scheduleSounds();
         drawSurface();
         drawDrops();
         animFrameId = requestAnimationFrame(renderFrame);
@@ -843,11 +900,16 @@ function createDropAnimator(cfg, chamberImg, canvas) {
         afterFrames(cfg.initDelayFrames, () => {
             const doStart = () => {
                 initCanvas();
+                computeFallMs();
                 drops = []; ripples = []; surfaceWaves = [];
                 lastTime = null;
-                renderFrame(performance.now());
-                spawnDrop();
-                dropIntervalId = setInterval(spawnDrop, intervalSec * 1000);
+                intervalMs      = intervalSec * 1000;
+                startTime       = performance.now();
+                lastSplashIndex = -1;
+                nextSoundIndex  = 0;
+                renderFrame(startTime);
+                // 描き直しが遅れているときも音の予約が途切れないよう、タイマーでも予約する
+                soundTimerId = setInterval(scheduleSounds, 100);
             };
             if (chamberImg.complete && chamberImg.naturalWidth > 0) {
                 doStart();
@@ -858,8 +920,8 @@ function createDropAnimator(cfg, chamberImg, canvas) {
     }
 
     function stop() {
-        if (animFrameId)    { cancelAnimationFrame(animFrameId); animFrameId = null; }
-        if (dropIntervalId) { clearInterval(dropIntervalId); dropIntervalId = null; }
+        if (animFrameId)  { cancelAnimationFrame(animFrameId); animFrameId = null; }
+        if (soundTimerId) { clearInterval(soundTimerId); soundTimerId = null; }
         drops = []; ripples = []; surfaceWaves = [];
         lastTime = null;
         if (canvasW > 0) ctx.clearRect(0, 0, canvasW, canvasH);
