@@ -1,0 +1,779 @@
+{
+  "app": "yueki-tekika-web",
+  "version": "5558b97-20261111T225952Z",
+  "sourceCommit": "5558b97ba41356b2f8984a746b541ca1823beb24",
+  "sourceCommitShort": "5558b97",
+  "sourceDirty": false,
+  "builtAt": "2026-11-11T22:59:52.043Z",
+  "files": {
+    "chambers.js": {
+      "sha256": "ce8952b29ae5cf32c1dc3b77fe7570e313fcc8660f9843ed223859b940b91bcd",
+      "size": 3660
+    },
+    "i18n/en-US.js": {
+      "sha256": "48775ff75ecc524863ee416ee621cf932a984d32f5c020df7a269a2c289dc58c",
+      "size": 3670
+    },
+    "i18n/es.js": {
+      "sha256": "11a83b0f1bde9b529f810eacdda41b992ad47f4d613d6a46d2d8373e786d6bf9",
+      "size": 4198
+    },
+    "i18n/ja.js": {
+      "sha256": "7605c2055fb02e01c75ca36202fb431b04e933ed376b6852e3334c74e4533e7f",
+      "size": 3563
+    },
+    "i18n/pt.js": {
+      "sha256": "a8a254b48134f0a825daabc0291d9d146793a2666513fb7c5d4445b3ec2bf1cc",
+      "size": 4190
+    },
+    "icons/apple-touch-icon.png": {
+      "sha256": "276d29132bbe8c20735ebf339533e9eaa8134b65354ade315469f21a84d86ea2",
+      "size": 40100
+    },
+    "icons/favicon-32.png": {
+      "sha256": "9920273d37b0e6c22a46b017c3154ceef650a3b401afc60abefa2dc13f006f67",
+      "size": 2124
+    },
+    "icons/icon-192.png": {
+      "sha256": "ffe4089cabe0b4ca5f7105e7f797213a284cd0eaa57ff417ab142ae12028c7b9",
+      "size": 44674
+    },
+    "icons/icon-512.png": {
+      "sha256": "e4b0e3a99f518a5a0466ab39719d0f5d0dc6c3b29f1ae21c7bc1f9e00c6f311e",
+      "size": 186583
+    },
+    "icons/icon-maskable-512.png": {
+      "sha256": "b72a9e4ae742c8904383bce6ef142ba218cc7c122b8de065d7aa56a20388806a",
+      "size": 119672
+    },
+    "img/100ml.PNG": {
+      "sha256": "4f18a2d24c661784d22e43b4a57e2349f18a47160828ce7dca597fc634f112c5",
+      "size": 157889
+    },
+    "img/1500ml.PNG": {
+      "sha256": "6d864421ddb02f9b9cdf02517136fd0b62b5cef79ec6ef404fe74faccd373ca9",
+      "size": 200173
+    },
+    "img/200ml.PNG": {
+      "sha256": "5b22a8c19e661e2b1533daf85f94dfa823ef97037dab138e98635f0063c3f2c4",
+      "size": 194114
+    },
+    "img/500ml.PNG": {
+      "sha256": "ac4736f264b7afa6eae70a4973fc7971968bf4f5a1adc7d267ee44d932878283",
+      "size": 163038
+    },
+    "img/50ml.PNG": {
+      "sha256": "61555494a366611b92b1f3045e4ae337db1e769eb24cd93f8a4fe8698f201095",
+      "size": 142160
+    },
+    "img/br/bag_1000ml.png": {
+      "sha256": "c9c17af9cc83eae93c91cf14565e5e50b3aa3d0cd7719116f04fcbfb7cae252a",
+      "size": 128547
+    },
+    "img/br/bag_100ml.png": {
+      "sha256": "c157b13eeb4723fa28d7bfda2c5b40a83c231b67eb6d372b80dc4312653a45ab",
+      "size": 226627
+    },
+    "img/br/bag_250ml.png": {
+      "sha256": "f36857b9b7078e18cb90b10b2839877e83275f822fdd2d177d7f963a874fb3c5",
+      "size": 248848
+    },
+    "img/br/bag_500ml.png": {
+      "sha256": "c7c9c9776e8dd57ee4b6c5387db809c2625e4190e581ba42787b3111b9ffa078",
+      "size": 164224
+    },
+    "img/seizin_tekika1.PNG": {
+      "sha256": "45a8fb8e558b0abd74692a655b4d0c82162b1e623bb959ea8c76d474106a2ee8",
+      "size": 210077
+    },
+    "img/seizin_tekika2.PNG": {
+      "sha256": "f02e0d8b6f10d75597f3daa9b98b0fa5fb4815b5ddfee6cfcc8f6f944dfe0e5b",
+      "size": 293411
+    },
+    "img/seizin_tekika3.PNG": {
+      "sha256": "4a2107ab1725125aff896ed0263e6c850b8a88a1bb4a06661e9fe359917ebe0d",
+      "size": 165626
+    },
+    "img/seizin_tekika4.PNG": {
+      "sha256": "172906729301ee2e9e0e9db435d3db752c00cb147ab5a7636e936ec70793e29e",
+      "size": 183452
+    },
+    "img/seizinyou.PNG": {
+      "sha256": "722956a1b4c7b5780fb649a961df90552477fe693b3ee04fd077170c61016231",
+      "size": 85395
+    },
+    "img/seizinyou_tekika.PNG": {
+      "sha256": "b95da75c89a3d44bb7ed2805316c311dc013829f7e9adf1a712b71d6045e8ab9",
+      "size": 224409
+    },
+    "img/sixyouni_tekika.PNG": {
+      "sha256": "ae3cbe081fd965fb6d4cdafad00493c6edf28edad55575fa9371870d71639fc4",
+      "size": 237665
+    },
+    "img/sixyouniyou.PNG": {
+      "sha256": "e8c3351b9472e4165b0af5fbda1f2836e547eeda54167ffaacecfe07e5903f75",
+      "size": 71180
+    },
+    "img/us/bag_1000ml.png": {
+      "sha256": "4e0098dce48a4b7d3f40f163739af1990b66ee8b249d115eaedc72d57422426c",
+      "size": 135306
+    },
+    "img/us/bag_100ml.png": {
+      "sha256": "27df845061a7a6328ad3d6ac18e013ea7a3de7ab5d52418e3e88c9c8f1b2dd95",
+      "size": 226940
+    },
+    "img/us/bag_250ml.png": {
+      "sha256": "309ced952857df81bf68b5dfda27de56c1a49bc14b9fc211c12725dfb0438842",
+      "size": 159035
+    },
+    "img/us/bag_500ml.png": {
+      "sha256": "48dfc322f96a770ac54efc73fa4ac7ddde931b3102989894bb9f40c167f56891",
+      "size": 186382
+    },
+    "img/us/bag_50ml.png": {
+      "sha256": "50b60bdfc77e85e3537301a69b7c911c391b9aa923952f4d6a05ce703270ac21",
+      "size": 221074
+    },
+    "img/us/macrodrip.png": {
+      "sha256": "c831caa81d42e5126c85d401bead94b46eb080188d2a27ef78361dcddeb96b40",
+      "size": 88700
+    },
+    "img/us/macrodrip_result.png": {
+      "sha256": "e4f9f0cd81bba141c2b692fed02790c06e1cb285bd8fe567ce73d00d8d643fd2",
+      "size": 250931
+    },
+    "img/us/microdrip.png": {
+      "sha256": "8f330d8214f86b743d79a5100225d2232cb613f53393bc5f0356547a4c0d06b1",
+      "size": 89229
+    },
+    "img/us/microdrip_result.png": {
+      "sha256": "42c35ba00af9b85ba25b27bade47ec01eda53564b00907f08172aa392a49b77f",
+      "size": 320672
+    },
+    "index.html": {
+      "sha256": "2d0b343dcdd80bdaf8db63e0aa295f230f2313a808f1055d9e58f80f3738900c",
+      "size": 12361
+    },
+    "manifest-en.webmanifest": {
+      "sha256": "91cbbb89d973f2262e3a7bb136dd5bc76681ed66be99f7538162a800df44ece8",
+      "size": 739
+    },
+    "manifest-es.webmanifest": {
+      "sha256": "de0078c5ecc3fc2c67caecaee4d636e55f07a5f0c98edbdca05d29b73f309b83",
+      "size": 716
+    },
+    "manifest-ja.webmanifest": {
+      "sha256": "0b54e6412c19f8b48e9972e161363984ccdf5c82d3e8667f0b7e979d52c211ef",
+      "size": 726
+    },
+    "manifest-pt.webmanifest": {
+      "sha256": "57cc77debf556c67d0dae2bc9f89bc5d3ef8bd61f36708a38bba496451e69da7",
+      "size": 731
+    },
+    "regions/es.js": {
+      "sha256": "910d2ef40051856b3d43b6e8a8d7e45b20453086a508580cb8a588122e13cc37",
+      "size": 2516
+    },
+    "regions/jp.js": {
+      "sha256": "2de4797d7a3d7c8fcdf8a6177dedf3f1bf9a36d5fc48f4b640294eeea6d8f3b3",
+      "size": 1968
+    },
+    "regions/pt.js": {
+      "sha256": "aab64b679cd2dcaea47a046afc79995d43d570ae9c852eed6f172841fc81c297",
+      "size": 2879
+    },
+    "regions/us.js": {
+      "sha256": "e0bb8f4b7d59cc2b811d9054cf28bbedb30b521f61fa25ad97f9ca8895b6412a",
+      "size": 1957
+    },
+    "revoked.json": {
+      "sha256": "33d370074796de7abdc19489b5a23201354a16443eb3998bd5baf10ea29f4db0",
+      "size": 20
+    },
+    "script.js": {
+      "sha256": "ebcad9341951d30ec6b05a68c1991012b975ccf08ada5069434a746fd8ba0332",
+      "size": 46513
+    },
+    "style.css": {
+      "sha256": "2cb91e8d8ea83dc27922e17709aff07549aa3e7cc3b7d9fa12068862e8b7ab7b",
+      "size": 23638
+    },
+    "sw.js": {
+      "sha256": "5a7e016fd5d8fd4d507c2e727cc609f8be974a1b0a67d62c15cc1d3f23a057d6",
+      "size": 14112
+    },
+    "web-post.js": {
+      "sha256": "a6d374a00e325b8e88fcacbe6dc76b4a4be4f1e51c6c8fe9dc5ad59fa4b953a3",
+      "size": 19505
+    },
+    "web-pre.js": {
+      "sha256": "47dd1b22a539d9019ee3ae1f3b7627c444ffe8fa1fa94198cc8d776764afaa6c",
+      "size": 5643
+    },
+    "web-selfcheck.js": {
+      "sha256": "b1d25d64f3662af79ad4a6efb3f6f6b603f2b248212f7bdbdc60a08909675697",
+      "size": 18343
+    },
+    "web.css": {
+      "sha256": "565df73468d52d847b57474793bb6449d17ddb6588c3a520c64c8cf18855e55d",
+      "size": 2840
+    }
+  },
+  "images": {
+    "img/100ml.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 564,
+        "h": 1133,
+        "bytes": 656681
+      },
+      "mode": "resize",
+      "output": {
+        "w": 299,
+        "h": 601,
+        "bytes": 157889
+      },
+      "display": {
+        "maxW": 99.6,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0581,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "4f18a2d24c661784d22e43b4a57e2349f18a47160828ce7dca597fc634f112c5"
+    },
+    "img/1500ml.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 924,
+        "h": 1483,
+        "bytes": 1299911
+      },
+      "mode": "resize",
+      "output": {
+        "w": 375,
+        "h": 602,
+        "bytes": 200173
+      },
+      "display": {
+        "maxW": 124.7,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0221,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "6d864421ddb02f9b9cdf02517136fd0b62b5cef79ec6ef404fe74faccd373ca9"
+    },
+    "img/200ml.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 654,
+        "h": 1140,
+        "bytes": 787293
+      },
+      "mode": "resize",
+      "output": {
+        "w": 345,
+        "h": 601,
+        "bytes": 194114
+      },
+      "display": {
+        "maxW": 114.8,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0626,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "5b22a8c19e661e2b1533daf85f94dfa823ef97037dab138e98635f0063c3f2c4"
+    },
+    "img/500ml.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 634,
+        "h": 1289,
+        "bytes": 825607
+      },
+      "mode": "resize",
+      "output": {
+        "w": 296,
+        "h": 602,
+        "bytes": 163038
+      },
+      "display": {
+        "maxW": 98.4,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0325,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "ac4736f264b7afa6eae70a4973fc7971968bf4f5a1adc7d267ee44d932878283"
+    },
+    "img/50ml.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 520,
+        "h": 1094,
+        "bytes": 546101
+      },
+      "mode": "resize",
+      "output": {
+        "w": 286,
+        "h": 602,
+        "bytes": 142160
+      },
+      "display": {
+        "maxW": 95.1,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0498,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "61555494a366611b92b1f3045e4ae337db1e769eb24cd93f8a4fe8698f201095"
+    },
+    "img/br/bag_1000ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 654,
+        "h": 1718,
+        "bytes": 1170041
+      },
+      "mode": "resize",
+      "output": {
+        "w": 229,
+        "h": 602,
+        "bytes": 128547
+      },
+      "display": {
+        "maxW": 76.2,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0726,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "c9c17af9cc83eae93c91cf14565e5e50b3aa3d0cd7719116f04fcbfb7cae252a"
+    },
+    "img/br/bag_100ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 814,
+        "h": 1083,
+        "bytes": 912636
+      },
+      "mode": "resize",
+      "output": {
+        "w": 452,
+        "h": 601,
+        "bytes": 226627
+      },
+      "display": {
+        "maxW": 150.4,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0617,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "c157b13eeb4723fa28d7bfda2c5b40a83c231b67eb6d372b80dc4312653a45ab"
+    },
+    "img/br/bag_250ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 830,
+        "h": 1202,
+        "bytes": 1142421
+      },
+      "mode": "resize",
+      "output": {
+        "w": 415,
+        "h": 601,
+        "bytes": 248848
+      },
+      "display": {
+        "maxW": 138.2,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "f36857b9b7078e18cb90b10b2839877e83275f822fdd2d177d7f963a874fb3c5"
+    },
+    "img/br/bag_500ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 640,
+        "h": 1298,
+        "bytes": 880410
+      },
+      "mode": "resize",
+      "output": {
+        "w": 297,
+        "h": 602,
+        "bytes": 164224
+      },
+      "display": {
+        "maxW": 98.7,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0587,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "c7c9c9776e8dd57ee4b6c5387db809c2625e4190e581ba42787b3111b9ffa078"
+    },
+    "img/seizin_tekika1.PNG": {
+      "policy": "recompressOnly",
+      "original": {
+        "w": 594,
+        "h": 380,
+        "bytes": 234162
+      },
+      "mode": "recompress",
+      "output": {
+        "w": 594,
+        "h": 380,
+        "bytes": 210077
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": true,
+      "sha256": "45a8fb8e558b0abd74692a655b4d0c82162b1e623bb959ea8c76d474106a2ee8"
+    },
+    "img/seizin_tekika2.PNG": {
+      "policy": "recompressOnly",
+      "original": {
+        "w": 458,
+        "h": 777,
+        "bytes": 332834
+      },
+      "mode": "recompress",
+      "output": {
+        "w": 458,
+        "h": 777,
+        "bytes": 293411
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": true,
+      "sha256": "f02e0d8b6f10d75597f3daa9b98b0fa5fb4815b5ddfee6cfcc8f6f944dfe0e5b"
+    },
+    "img/seizin_tekika3.PNG": {
+      "policy": "recompressOnly",
+      "original": {
+        "w": 417,
+        "h": 413,
+        "bytes": 183299
+      },
+      "mode": "recompress",
+      "output": {
+        "w": 417,
+        "h": 413,
+        "bytes": 165626
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": true,
+      "sha256": "4a2107ab1725125aff896ed0263e6c850b8a88a1bb4a06661e9fe359917ebe0d"
+    },
+    "img/seizin_tekika4.PNG": {
+      "policy": "recompressOnly",
+      "original": {
+        "w": 547,
+        "h": 353,
+        "bytes": 203634
+      },
+      "mode": "recompress",
+      "output": {
+        "w": 547,
+        "h": 353,
+        "bytes": 183452
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": true,
+      "sha256": "172906729301ee2e9e0e9db435d3db752c00cb147ab5a7636e936ec70793e29e"
+    },
+    "img/seizinyou.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 734,
+        "h": 2020,
+        "bytes": 945142
+      },
+      "mode": "resize",
+      "output": {
+        "w": 301,
+        "h": 828,
+        "bytes": 85395
+      },
+      "display": {
+        "maxW": 100,
+        "maxH": 275.3,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0441,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "722956a1b4c7b5780fb649a961df90552477fe693b3ee04fd077170c61016231"
+    },
+    "img/seizinyou_tekika.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 718,
+        "h": 1154,
+        "bytes": 320558
+      },
+      "mode": "resize",
+      "output": {
+        "w": 601,
+        "h": 966,
+        "bytes": 224409
+      },
+      "display": {
+        "maxW": 200,
+        "maxH": 321.5,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0049,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "b95da75c89a3d44bb7ed2805316c311dc013829f7e9adf1a712b71d6045e8ab9"
+    },
+    "img/sixyouni_tekika.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 667,
+        "h": 1050,
+        "bytes": 610593
+      },
+      "mode": "resize",
+      "output": {
+        "w": 601,
+        "h": 946,
+        "bytes": 237665
+      },
+      "display": {
+        "maxW": 200,
+        "maxH": 314.9,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0108,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "ae3cbe081fd965fb6d4cdafad00493c6edf28edad55575fa9371870d71639fc4"
+    },
+    "img/sixyouniyou.PNG": {
+      "policy": "display",
+      "original": {
+        "w": 686,
+        "h": 1880,
+        "bytes": 763268
+      },
+      "mode": "resize",
+      "output": {
+        "w": 301,
+        "h": 825,
+        "bytes": 71180
+      },
+      "display": {
+        "maxW": 100,
+        "maxH": 274.1,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0124,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "e8c3351b9472e4165b0af5fbda1f2836e547eeda54167ffaacecfe07e5903f75"
+    },
+    "img/us/bag_1000ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 709,
+        "h": 1665,
+        "bytes": 1116071
+      },
+      "mode": "resize",
+      "output": {
+        "w": 256,
+        "h": 601,
+        "bytes": 135306
+      },
+      "display": {
+        "maxW": 85.2,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0307,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "4e0098dce48a4b7d3f40f163739af1990b66ee8b249d115eaedc72d57422426c"
+    },
+    "img/us/bag_100ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 619,
+        "h": 1234,
+        "bytes": 997203
+      },
+      "mode": "resize",
+      "output": {
+        "w": 302,
+        "h": 602,
+        "bytes": 226940
+      },
+      "display": {
+        "maxW": 100.4,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0081,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "27df845061a7a6328ad3d6ac18e013ea7a3de7ab5d52418e3e88c9c8f1b2dd95"
+    },
+    "img/us/bag_250ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 541,
+        "h": 1238,
+        "bytes": 720048
+      },
+      "mode": "resize",
+      "output": {
+        "w": 263,
+        "h": 602,
+        "bytes": 159035
+      },
+      "display": {
+        "maxW": 87.4,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.027,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "309ced952857df81bf68b5dfda27de56c1a49bc14b9fc211c12725dfb0438842"
+    },
+    "img/us/bag_500ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 735,
+        "h": 1394,
+        "bytes": 1101569
+      },
+      "mode": "resize",
+      "output": {
+        "w": 317,
+        "h": 601,
+        "bytes": 186382
+      },
+      "display": {
+        "maxW": 105.5,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0369,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "48dfc322f96a770ac54efc73fa4ac7ddde931b3102989894bb9f40c167f56891"
+    },
+    "img/us/bag_50ml.png": {
+      "policy": "display",
+      "original": {
+        "w": 668,
+        "h": 1201,
+        "bytes": 814724
+      },
+      "mode": "resize",
+      "output": {
+        "w": 334,
+        "h": 601,
+        "bytes": 221074
+      },
+      "display": {
+        "maxW": 111.3,
+        "maxH": 200,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0832,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "50b60bdfc77e85e3537301a69b7c911c391b9aa923952f4d6a05ce703270ac21"
+    },
+    "img/us/macrodrip.png": {
+      "policy": "display",
+      "original": {
+        "w": 658,
+        "h": 1811,
+        "bytes": 878679
+      },
+      "mode": "resize",
+      "output": {
+        "w": 301,
+        "h": 828,
+        "bytes": 88700
+      },
+      "display": {
+        "maxW": 100,
+        "maxH": 275.3,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0527,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "c831caa81d42e5126c85d401bead94b46eb080188d2a27ef78361dcddeb96b40"
+    },
+    "img/us/macrodrip_result.png": {
+      "policy": "display",
+      "original": {
+        "w": 619,
+        "h": 995,
+        "bytes": 487526
+      },
+      "mode": "resize",
+      "output": {
+        "w": 601,
+        "h": 966,
+        "bytes": 250931
+      },
+      "display": {
+        "maxW": 200,
+        "maxH": 321.5,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0069,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "e4f9f0cd81bba141c2b692fed02790c06e1cb285bd8fe567ce73d00d8d643fd2"
+    },
+    "img/us/microdrip.png": {
+      "policy": "display",
+      "original": {
+        "w": 605,
+        "h": 1665,
+        "bytes": 565793
+      },
+      "mode": "resize",
+      "output": {
+        "w": 301,
+        "h": 828,
+        "bytes": 89229
+      },
+      "display": {
+        "maxW": 100,
+        "maxH": 275.3,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0.0449,
+      "pixelsIdenticalToOriginal": false,
+      "sha256": "8f330d8214f86b743d79a5100225d2232cb613f53393bc5f0356547a4c0d06b1"
+    },
+    "img/us/microdrip_result.png": {
+      "policy": "display",
+      "original": {
+        "w": 563,
+        "h": 905,
+        "bytes": 322667
+      },
+      "mode": "recompress",
+      "output": {
+        "w": 563,
+        "h": 905,
+        "bytes": 320672
+      },
+      "display": {
+        "maxW": 200,
+        "maxH": 321.5,
+        "dpr": 3
+      },
+      "aspectErrorPct": 0,
+      "pixelsIdenticalToOriginal": true,
+      "sha256": "42c35ba00af9b85ba25b27bade47ec01eda53564b00907f08172aa392a49b77f"
+    }
+  },
+  "excludedImages": [
+    "img/in_chamber.png"
+  ]
+}

@@ -1,0 +1,112 @@
+/* ============================================================
+   Web 版だけの上書き（Android 版と共通の style.css は変更しない）
+   build.mjs が index.html の style.css の直後に読み込ませる
+   ============================================================ */
+
+/* PC など横幅の広い画面で、アプリ全体（最大 500px）を中央に寄せる。
+   スマホの幅では .container が画面いっぱいになるため margin: auto は効かず、見た目は Android 版と同じ */
+.container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ------------------------------------------------------------
+   更新・オフラインのお知らせ（web-post.js が画面の一番上に入れる）
+   ------------------------------------------------------------ */
+.web-status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 12px;
+    margin: 8px 12px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #eceff1;
+    color: #546e7a;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+.web-status-bar[hidden] {
+    display: none;
+}
+.web-status-bar.has-action {
+    background: #e1f5fe;
+    color: #01579b;
+}
+.web-status-bar.is-error {
+    background: #fff3e0;
+    color: #e65100;
+}
+.web-update-btn {
+    min-height: 32px;
+    padding: 4px 16px;
+    border: none;
+    border-radius: 16px;
+    background: #0288d1;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.web-update-btn:disabled {
+    background: #90a4ae;
+    cursor: default;
+}
+
+/* 使用停止の版：画面全体を覆って使えないようにする */
+.web-revoked {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.97);
+}
+.web-revoked-panel {
+    max-width: 340px;
+    text-align: center;
+}
+.web-revoked-title {
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #c62828;
+}
+.web-revoked-body {
+    margin-bottom: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #455a64;
+    white-space: pre-line;
+}
+
+/* 版情報（地域の選択画面と同じ見た目の枠を使う） */
+.web-info-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    margin: 0 4px 14px;
+    font-size: 13px;
+}
+.web-info-list dt {
+    color: #90a4ae;
+}
+.web-info-list dd {
+    margin: 0;
+    color: #455a64;
+    word-break: break-all;
+}
+
+/* 起動時の確認が終わる前に「計算する」が押されたときの案内（web-selfcheck.js） */
+.web-selfcheck-wait {
+    margin: 8px 16px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #0277bd;
+    text-align: center;
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="app-version" content="5558b97-20261111T225952Z">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輸液滴下計算 | 看護師・看護学生向け点滴滴下計算アプリ</title>
+    <link rel="stylesheet" href="style.css?v=5558b97-20261111T225952Z">
+    <link rel="stylesheet" href="web.css?v=5558b97-20261111T225952Z">
+</head>
+<body>
+    <div class="container">
+        <!-- 入力画面 -->
+        <div id="inputScreen" class="screen active">
+            <div class="app-title-wrap">
+                <h1 class="app-title" data-i18n="app.title">輸液滴下計算</h1>
+                <p class="app-subtitle" data-i18n="app.subtitle">看護師・看護学生向け点滴滴下計算アプリ</p>
+            </div>
+
+            <div class="form-group">
+                <div class="label-hint-row">
+                    <label data-i18n="volume.label">輸液量</label>
+                    <p class="swipe-hint" data-i18n="volume.hint">左右にスワイプ・タップで選択</p>
+                </div>
+                <div class="volume-swiper-wrapper">
+                    <button class="swiper-arrow left" id="prevBtn">&#8249;</button>
+                    <div class="volume-swiper">
+                        <div class="swiper-track" id="swiperTrack">
+                            <!-- 輸液量プリセットは地域プロファイルから script.js で生成（手動入力の前に挿入） -->
+                            <div class="swiper-item" data-volume="manual">
+                                <div class="manual-input-box">
+                                    <p class="manual-label" data-i18n="volume.manualLabel">手動で入力</p>
+                                    <input type="number" id="manualVolume" placeholder="例：250" data-i18n-placeholder="volume.manualPlaceholder" min="1" step="1" enterkeyhint="done">
+                                    <button id="manualConfirmBtn" class="manual-confirm-btn" data-i18n="volume.manualConfirm">決定</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="swiper-arrow right" id="nextBtn">&#8250;</button>
+                </div>
+                <p class="selected-volume-label"><span id="selectedVolumeText" data-i18n="volume.none">未選択</span></p>
+            </div>
+
+            <div class="form-group">
+                <label data-i18n="tubing.label">輸液ルートの種類</label>
+                <!-- 輸液ルートのボタンは地域プロファイルから script.js で生成 -->
+                <div class="button-group" id="tubingGroup"></div>
+            </div>
+
+            <div class="form-group">
+                <div class="label-hint-row">
+                    <label data-i18n="time.label">投与時間</label>
+                    <p class="swipe-hint" data-i18n="time.hint">数字をタップして選択</p>
+                </div>
+                <div class="time-card">
+                    <div class="time-spinner-wrap">
+                        <button class="time-arrow-btn" id="hourUp">▲</button>
+                        <select id="hourSelect" class="time-select">
+                            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                            <option value="6">6</option><option value="7">7</option><option value="8" selected>8</option>
+                            <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+                            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                            <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            <option value="24">24</option>
+                        </select>
+                        <button class="time-arrow-btn" id="hourDown">▼</button>
+                    </div>
+                    <span class="time-label" data-i18n="time.hour">時間</span>
+                    <div class="time-spinner-wrap">
+                        <button class="time-arrow-btn" id="minuteUp">▲</button>
+                        <select id="minuteSelect" class="time-select">
+                            <option value="0" selected>00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                        <button class="time-arrow-btn" id="minuteDown">▼</button>
+                    </div>
+                    <span class="time-label" data-i18n="time.minute">分</span>
+                </div>
+            </div>
+
+            <p class="summary-title" data-i18n="summary.title">計算式</p>
+            <div class="confirm-summary" id="confirmSummary">
+                <span class="summary-value" id="summaryVolume">--</span><span class="summary-unit"> mL</span> <span class="summary-operator">×</span> <span class="summary-value" id="summaryDrop">--</span><span class="summary-unit" data-i18n="summary.dropUnit">滴/mL</span>
+                <div class="summary-divider"></div>
+                <span class="summary-value" id="summaryHour">--</span><span class="summary-unit" data-i18n="summary.hour">時間</span><span class="summary-value" id="summaryMin">--</span><span class="summary-unit" data-i18n="summary.minOpen">分（</span><span class="summary-value" id="summaryTotalMin">--</span><span class="summary-unit" data-i18n="summary.minClose">分）</span>
+            </div>
+
+            <button id="calculateBtn" class="calculate-btn" data-i18n="calculate">計算する</button>
+
+            <!-- 免責表示（地域プロファイルに disclaimerKey がある地域だけ表示） -->
+            <p class="disclaimer" id="disclaimer" hidden></p>
+
+            <!-- プライバシーポリシーと地域切替は横に並べる（縦に並べると広告に近く、押し間違えやすいため） -->
+            <div class="footer-links" id="footerLinks">
+                <a href="https://hitomi200ban-ux.github.io/privacy-policy-yueki/" target="_blank" rel="noopener" class="privacy-link" id="privacyLink" data-i18n="privacy">プライバシーポリシー</a>
+                <!-- 地域切替（文言は script.js で設定） -->
+                <button type="button" id="regionLink" class="region-link"></button>
+            </div>
+
+            <div id="bannerAdSpace" class="banner-ad-space"></div>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="resultScreen" class="screen result-screen-layout">
+
+            <div class="result-title" data-i18n="app.title">輸液滴下計算</div>
+            <div class="result-subtitle" data-i18n="app.subtitle">看護師・看護学生向け点滴滴下計算アプリ</div>
+
+            <!-- チャンバー中央・数値を四隅に配置 -->
+            <div class="result-card">
+                <!-- 左上：滴下速度 -->
+                <div class="rn-topleft">
+                    <div class="rn-label" data-i18n="result.rateLabel">滴下速度</div>
+                    <div class="rn-rate-wrap">
+                        <span class="rn-rate" id="dropRate">--</span>
+                    </div>
+                    <div class="rn-unit" data-i18n="result.rateUnit">滴/分</div>
+                    <div class="rn-exact">(<span id="dropRateExact">--</span>)</div>
+                </div>
+
+                <!-- 右上：音ボタン -->
+                <button id="soundBtn" class="sound-btn-v sound-btn-corner" data-on="false">
+                    <span class="sound-icon">🔇</span>
+                    <span class="sound-label-v" data-i18n="sound.off">音OFF</span>
+                </button>
+
+                <!-- 中央：アニメーション -->
+                <!-- チャンバー画像とCanvasは地域プロファイルから script.js で生成 -->
+                <div class="result-center" id="chamberArea"></div>
+
+                <!-- 右下：計算式ボタン -->
+                <button class="formula-toggle-v" id="formulaToggle" aria-expanded="false">
+                    <span data-i18n="result.formulaToggle">計算式</span>
+                </button>
+
+                <!-- 左下：合わせ方 -->
+                <div class="rn-bottomleft">
+                    <div class="rn-label" data-i18n="result.intervalLabel">合わせ方</div>
+                    <div class="rn-sec-wrap">
+                        <span class="rn-sec" id="dropIntervalSec">--</span>
+                    </div>
+                    <div class="rn-sec-unit" data-i18n="result.intervalUnit">秒に1滴</div>
+                </div>
+            </div>
+
+            <!-- 計算式パネル（タップで表示） -->
+            <div class="formula-body" id="formulaBody">
+                <div class="formula-inner">
+                    <div class="formula-line">
+                        <span class="formula-val" id="fVolume">--</span><span class="formula-unit" data-i18n="formula.volumeUnit">mL</span>
+                        <span class="formula-op"> × </span>
+                        <span class="formula-val" id="fDrop">--</span><span class="formula-unit" data-i18n="formula.dropUnit">滴/mL</span>
+                    </div>
+                    <div class="formula-divider"></div>
+                    <div class="formula-line formula-time">
+                        <span class="formula-val" id="fHour">--</span><span class="formula-unit" data-i18n="formula.hour">時間</span>
+                        <span class="formula-val" id="fMin">--</span><span class="formula-unit" data-i18n="formula.minute">分</span>
+                        <span class="formula-paren"><span data-i18n="formula.parenOpen">（</span><span id="fTotalMin">--</span><span data-i18n="formula.parenClose">分）</span></span>
+                    </div>
+                    <div class="formula-result-line">
+                        <span class="formula-eq">= </span><span class="formula-exact" id="fExact">--</span><span class="formula-unit" data-i18n="formula.resultUnit"> 滴/分</span>
+                    </div>
+                    <div class="formula-result-line">
+                        <span class="formula-eq">≈ </span><span class="formula-approx" id="fApprox">--</span><span class="formula-unit" data-i18n="formula.resultUnit"> 滴/分</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 旧IDを維持（アニメーション用） -->
+            <span id="dropInterval" style="display:none;"></span>
+
+            <button id="backBtn" class="back-btn" data-i18n="result.back">戻る</button>
+
+            <div id="bannerAdSpaceResult" class="banner-ad-space"></div>
+        </div>
+    </div>
+
+    <!-- 読み込み順：文言辞書 → チャンバー設定 → 地域プロファイル → 本体 -->
+    <script src="web-pre.js?v=5558b97-20261111T225952Z"></script>
+    <script src="i18n/ja.js?v=5558b97-20261111T225952Z"></script>
+    <script src="i18n/en-US.js?v=5558b97-20261111T225952Z"></script>
+    <script src="i18n/es.js?v=5558b97-20261111T225952Z"></script>
+    <script src="i18n/pt.js?v=5558b97-20261111T225952Z"></script>
+    <script src="chambers.js?v=5558b97-20261111T225952Z"></script>
+    <script src="regions/jp.js?v=5558b97-20261111T225952Z"></script>
+    <script src="regions/us.js?v=5558b97-20261111T225952Z"></script>
+    <script src="regions/es.js?v=5558b97-20261111T225952Z"></script>
+    <script src="regions/pt.js?v=5558b97-20261111T225952Z"></script>
+    <script src="script.js?v=5558b97-20261111T225952Z"></script>
+    <script src="web-post.js?v=5558b97-20261111T225952Z"></script>
+    <script src="web-selfcheck.js?v=5558b97-20261111T225952Z"></script>
+</body>
+</html>
